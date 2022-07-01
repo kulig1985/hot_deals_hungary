@@ -59,9 +59,9 @@ class _ShopingItemState extends State<ShopingItem> {
     return Container(
       width: double.infinity,
       margin: EdgeInsets.only(bottom: 5.0),
-      padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+      padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
       decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(10.0)),
+          color: Colors.white, borderRadius: BorderRadius.circular(15.0)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

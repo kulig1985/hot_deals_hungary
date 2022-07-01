@@ -1,4 +1,4 @@
-import 'package:hot_deals_hungary/models/item.dart';
+import 'package:hot_deals_hungary/models/offer_listener_item.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -14,25 +14,26 @@ class DataBaseHelper {
     );
   }
 
-  Future<void> insertItem(Item item) async {
+  Future<void> insertItem(OfferListenerItem item) async {
     Database _db = await dataBase();
 
     await _db.insert('ITEM', item.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  Future<List<Item>> getAllItem() async {
+  Future<List<OfferListenerItem>> getAllItem() async {
     Database _db = await dataBase();
-
+    print("getAllItem invoked!");
     List<Map<String, dynamic>> itemMap = await _db.query('ITEM');
     return List.generate(itemMap.length, (index) {
-      return Item(
+      return OfferListenerItem(
           id: itemMap[index]['id'], itemName: itemMap[index]['itemName']);
     });
   }
 
   Future<void> deleteTask(int itemId) async {
     Database _db = await dataBase();
+    print("deleteTask invoked with itemId: $itemId");
     await _db.rawDelete("DELETE FROM ITEM WHERE id = '$itemId'");
   }
 }

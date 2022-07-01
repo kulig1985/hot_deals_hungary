@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:hot_deals_hungary/models/item.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:hot_deals_hungary/models/offer_listener_item.dart';
 import 'package:hot_deals_hungary/models/offer.dart';
 import 'package:hot_deals_hungary/services/database_helper.dart';
 import 'package:hot_deals_hungary/services/offer_service.dart';
 
 class NewItem extends StatefulWidget {
-  final Item? item;
+  final OfferListenerItem? item;
   const NewItem({Key? key, this.item}) : super(key: key);
 
   @override
@@ -64,13 +65,13 @@ class _NewItemState extends State<NewItem> {
                         }
                         */
                       },
-                      child: const Padding(
-                        padding: EdgeInsets.all(24.0),
-                        child: Image(
-                          image: AssetImage('assets/images/cart_ok.png'),
-                          width: 60,
-                          height: 60,
-                        ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: SizedBox(
+                            height: 30,
+                            width: 30,
+                            child: SvgPicture.asset(
+                                "assets/images/back_icon.svg")),
                       ),
                     ),
                     Expanded(
@@ -85,7 +86,8 @@ class _NewItemState extends State<NewItem> {
                             if (widget.item == null) {
                               DataBaseHelper _dbHelper = DataBaseHelper();
 
-                              Item newItem = Item(itemName: value);
+                              OfferListenerItem newItem =
+                                  OfferListenerItem(itemName: value);
 
                               await _dbHelper.insertItem(newItem);
 
@@ -112,7 +114,7 @@ class _NewItemState extends State<NewItem> {
             ],
           ),
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 100.0),
+            padding: const EdgeInsets.symmetric(vertical: 80),
             child: Column(
               children: [
                 Expanded(
@@ -131,7 +133,7 @@ class _NewItemState extends State<NewItem> {
                               return Container(
                                 //padding: const EdgeInsets.all(2),
                                 width: double.infinity,
-                                margin: EdgeInsets.only(bottom: 10.0),
+                                margin: const EdgeInsets.only(bottom: 10.0),
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 10.0, vertical: 10.0),
                                 decoration: BoxDecoration(
@@ -169,11 +171,6 @@ class _NewItemState extends State<NewItem> {
                                             maxLines: 3,
                                             overflow: TextOverflow.ellipsis,
                                           )
-                                          /*Text(
-                                    'Bolt: ${offerList![index].shopName}',
-                                    maxLines: 3,
-                                    overflow: TextOverflow.ellipsis,
-                                  )*/
                                         ],
                                       ),
                                     ),
@@ -181,6 +178,25 @@ class _NewItemState extends State<NewItem> {
                                 ),
                               );
                             });
+                        /*
+                        return GridView.builder(
+                            gridDelegate:
+                                const SliverGridDelegateWithMaxCrossAxisExtent(
+                                    maxCrossAxisExtent: 200,
+                                    childAspectRatio: 3 / 2,
+                                    crossAxisSpacing: 20,
+                                    mainAxisSpacing: 20),
+                            itemCount: data.length,
+                            itemBuilder: (ctx, index) {
+                              return Container(
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                    color: Colors.amber,
+                                    borderRadius: BorderRadius.circular(15)),
+                                child: Text(data[index].itemName),
+                              );
+                            });
+                      */
                       }
                     },
                   ),
@@ -188,8 +204,9 @@ class _NewItemState extends State<NewItem> {
               ],
             ),
           ),
+          /*
           Positioned(
-              bottom: 10.0,
+              bottom: 5.0,
               right: 32.0,
               child: GestureDetector(
                 onTap: () {
@@ -210,7 +227,7 @@ class _NewItemState extends State<NewItem> {
                     ),
                   ),
                 ),
-              ))
+              ))*/
         ])),
       ),
     );
