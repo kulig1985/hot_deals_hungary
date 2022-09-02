@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:hot_deals_hungary/models/offer.dart';
+import 'package:hot_deals_hungary/models/mongo/offer.dart';
 import 'package:http/http.dart' as http;
 
 class OfferService {
-  Future<List<Offer>> getOffers(String itemCleanName) async {
+  Future<List<OfferOld>> getOffers(String itemCleanName) async {
     var client = http.Client();
 
     if (itemCleanName == '') {
@@ -15,7 +15,7 @@ class OfferService {
       var response = await client.get(uri);
 
       var json = response.body;
-      List<Offer> offerList = offerFromJson(json);
+      List<OfferOld> offerList = offerOldFromJson(json);
 
       if (offerList.isNotEmpty) {
         return offerList;
@@ -25,22 +25,25 @@ class OfferService {
     }
   }
 
-  Future<List<Offer>> createEmptyOfferList() {
-    var completer = Completer<List<Offer>>();
+  Future<List<OfferOld>> createEmptyOfferList() {
+    var completer = Completer<List<OfferOld>>();
 
-    List<Offer> emptyOfferList = <Offer>[];
+    List<OfferOld> emptyOfferList = <OfferOld>[];
 
-    Offer emptyOffer = Offer(
-        id: Id(oid: 'Na.'),
+    OfferOld emptyOffer = OfferOld(
+        id: IdOf(oid: 'Na.'),
         itemId: 'Na.',
         itemName: 'Nincs akció - változtass a termék nevén',
         itemCleanName: 'Nincs akció',
+        imageUrl: 'https://picsum.photos/60',
         price: 0,
         measure: 'Na.',
         salesStart: 'Na.',
         source: 'Na.',
         runDate: 'Na.',
-        shopName: 'Na.');
+        shopName: 'Na.',
+        timeKey: 'Na.',
+        insertType: 'Na.');
 
     emptyOfferList.add(emptyOffer);
 

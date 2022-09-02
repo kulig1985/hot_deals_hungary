@@ -1,7 +1,11 @@
+/*
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
+import 'package:hot_deals_hungary/controllers/cart_controller.dart';
 import 'package:hot_deals_hungary/models/offer_listener_item.dart';
 import 'package:hot_deals_hungary/models/offer.dart';
+import 'package:hot_deals_hungary/screens/home_page.dart';
 import 'package:hot_deals_hungary/services/database_helper.dart';
 import 'package:hot_deals_hungary/services/offer_service.dart';
 
@@ -17,6 +21,7 @@ class _NewItemState extends State<NewItem> {
   final itemNameController = TextEditingController();
   DataBaseHelper _dataBaseHelper = DataBaseHelper();
   OfferService _offerService = OfferService();
+  CartController cartController = Get.find();
 
   int itemId = 0;
   String itemName = "";
@@ -25,7 +30,7 @@ class _NewItemState extends State<NewItem> {
   void initState() {
     if (widget.item != null) {
       itemName = widget.item!.itemName;
-      itemId = widget.item!.id!;
+      itemId = widget.item!.ofitId!;
     }
 
     super.initState();
@@ -46,24 +51,32 @@ class _NewItemState extends State<NewItem> {
                     InkWell(
                       onTap: () async {
                         Navigator.pop(context);
-                        /*
+
                         if (itemNameController.text != '') {
                           Navigator.pop(context);
-                          
+
                           DataBaseHelper _dbHelper = DataBaseHelper();
 
-                          Item newItem =
-                              Item(itemName: itemNameController.text);
+                          OfferListenerItem newItem = OfferListenerItem(
+                              itemName: itemNameController.text);
 
-                          await _dbHelper.insertItem(newItem);
+                          await _dbHelper.insertOfferListenerItem(newItem);
 
                           print('New Item created!');
 
-                          Navigator.pop(context);
+                          // ignore: use_build_context_synchronously
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const HomePage()),
+                          );
                         } else {
-                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const HomePage()),
+                          );
                         }
-                        */
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(24.0),
@@ -89,7 +102,7 @@ class _NewItemState extends State<NewItem> {
                               OfferListenerItem newItem =
                                   OfferListenerItem(itemName: value);
 
-                              await _dbHelper.insertItem(newItem);
+                              await _dbHelper.insertOfferListenerItem(newItem);
 
                               print('New Item created!');
 
@@ -97,7 +110,7 @@ class _NewItemState extends State<NewItem> {
 
                               setState(() {});
 
-                              //Navigator.pop(context);
+                              Navigator.pop(context);
                             } else {}
                           }
                         },
@@ -113,6 +126,7 @@ class _NewItemState extends State<NewItem> {
               )
             ],
           ),
+          /*
           Container(
             padding: const EdgeInsets.symmetric(vertical: 80),
             child: Column(
@@ -148,19 +162,21 @@ class _NewItemState extends State<NewItem> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            data[index].itemName,
+                                            '${data[index].itemName} - ${data[index].shopName}',
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
                                             style: const TextStyle(
-                                              fontSize: 14,
+                                              fontSize: 15,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          Text(
-                                            '${data[index].price} ,-Ft - ${data[index].shopName}',
-                                            maxLines: 3,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
+                                          Text('${data[index].price},-Ft',
+                                              maxLines: 3,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
+                                              )),
                                           Text(
                                             'Kiszerelés: ${data[index].measure}',
                                             maxLines: 3,
@@ -170,10 +186,35 @@ class _NewItemState extends State<NewItem> {
                                             'Akció kezdete: ${data[index].salesStart}',
                                             maxLines: 3,
                                             overflow: TextOverflow.ellipsis,
-                                          )
+                                          ),
                                         ],
                                       ),
                                     ),
+                                    Material(
+                                      borderRadius: BorderRadius.circular(20),
+                                      color: Colors.white,
+                                      child: InkWell(
+                                          borderRadius:
+                                              BorderRadius.circular(120),
+                                          radius: 120,
+                                          onTap: () {
+                                            cartController
+                                                .addOffer(data[index]);
+                                          },
+                                          splashColor: const Color.fromARGB(
+                                              255, 173, 173, 173),
+                                          highlightColor: const Color.fromARGB(
+                                              255, 255, 255, 255),
+                                          child: const SizedBox(
+                                              width: 40,
+                                              height: 40,
+                                              child: Image(
+                                                image: AssetImage(
+                                                    'assets/images/add_bag.png'),
+                                                width: 50,
+                                                height: 50,
+                                              ))),
+                                    )
                                   ],
                                 ),
                               );
@@ -204,7 +245,7 @@ class _NewItemState extends State<NewItem> {
               ],
             ),
           ),
-          /*
+          
           Positioned(
               bottom: 5.0,
               right: 32.0,
@@ -233,3 +274,4 @@ class _NewItemState extends State<NewItem> {
     );
   }
 }
+*/
