@@ -34,6 +34,7 @@ class _SearchOffersPageState extends State<SearchOffersPage> {
   var messageVisible = false;
   var opactityVisible = false;
   var saveButtonVisible = true;
+  var listVisible = true;
 
   @override
   void initState() {
@@ -136,12 +137,15 @@ class _SearchOffersPageState extends State<SearchOffersPage> {
                 child: Container(
                   margin: EdgeInsets.only(left: 20, right: 10),
                   height: 38,
-                  child: Text(
-                    "${_mainDaoController.choosenShoppingList.value.offerModelList[widget.index!].offers.length.toString()}db akciós ${widget.itemCleanName} találat",
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold),
+                  child: Visibility(
+                    visible: listVisible,
+                    child: Text(
+                      "${_mainDaoController.choosenShoppingList.value.offerModelList[widget.index!].offers.length.toString()}db akciós ${widget.itemCleanName} találat",
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
                   /*Text(
                       widget.searchText!,
@@ -238,252 +242,279 @@ class _SearchOffersPageState extends State<SearchOffersPage> {
                 ),
               ),
             ),
-            Expanded(
-                child: ListView.builder(
-                    itemCount: _mainDaoController.choosenShoppingList.value
-                        .offerModelList[widget.index!].offers.length,
-                    itemBuilder: (BuildContext ctx, index) {
-                      Offer offer = _mainDaoController.choosenShoppingList.value
-                          .offerModelList[widget.index!].offers[index];
-                      return AnimationConfiguration.staggeredList(
-                        position: index,
-                        duration: const Duration(milliseconds: 70),
-                        child: SlideAnimation(
-                          verticalOffset: 20.0,
-                          child: FadeInAnimation(
-                            child: Container(
-                              height: 90,
-                              margin: const EdgeInsets.only(
-                                  bottom: 2, left: 10, right: 10),
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(5.0)),
-                              child: Row(
-                                children: [
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  FutureBuilder(
-                                    future: checkImageUrl(
-                                        'http://95.138.193.102:9988/image_download/${offer.imageUrl}'),
-                                    builder: ((context, snapshot) {
-                                      if (snapshot.data != null) {
-                                        return FadeInImage(
-                                          width: 80,
-                                          height: 80,
-                                          placeholder: const AssetImage(
-                                              'assets/images/wait.png'),
-                                          image: NetworkImage(
-                                              'http://95.138.193.102:9988/image_download/${offer.imageUrl}'),
-                                        );
-                                      } else {
-                                        return const Image(
-                                          image: AssetImage(
-                                              'assets/images/image_not_found.png'),
-                                          width: 75,
-                                          height: 75,
-                                        );
-                                      }
-                                    }),
-                                  ),
-                                  Container(
-                                    margin: EdgeInsets.only(left: 10),
-                                    child: Column(
+            Visibility(
+                visible: !listVisible,
+                child: Container(
+                  child: Center(
+                      child: Column(
+                    children: const [
+                      CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
+                      Text(
+                        "Egy pillanat...",
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold),
+                      )
+                    ],
+                  )),
+                )),
+            Visibility(
+              visible: listVisible,
+              child: Expanded(
+                  child: ListView.builder(
+                      itemCount: _mainDaoController.choosenShoppingList.value
+                          .offerModelList[widget.index!].offers.length,
+                      itemBuilder: (BuildContext ctx, index) {
+                        Offer offer = _mainDaoController.choosenShoppingList
+                            .value.offerModelList[widget.index!].offers[index];
+                        return AnimationConfiguration.staggeredList(
+                          position: index,
+                          duration: const Duration(milliseconds: 70),
+                          child: SlideAnimation(
+                            verticalOffset: 20.0,
+                            child: FadeInAnimation(
+                              child: Container(
+                                height: 120,
+                                margin: const EdgeInsets.only(
+                                    bottom: 2, left: 5, right: 5),
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(5.0)),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    FutureBuilder(
+                                      future: checkImageUrl(
+                                          'http://95.138.193.102:9988/image_download/${offer.imageUrl}'),
+                                      builder: ((context, snapshot) {
+                                        if (snapshot.data != null) {
+                                          return FadeInImage(
+                                            width: 100,
+                                            height: 100,
+                                            placeholder: const AssetImage(
+                                                'assets/images/wait.png'),
+                                            image: NetworkImage(
+                                                'http://95.138.193.102:9988/image_download/${offer.imageUrl}'),
+                                          );
+                                        } else {
+                                          return const Image(
+                                            image: AssetImage(
+                                                'assets/images/image_not_found.png'),
+                                            width: 75,
+                                            height: 75,
+                                          );
+                                        }
+                                      }),
+                                    ),
+                                    Expanded(
+                                      child: Container(
+                                        width: 200,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              '${offer.price},-Ft',
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            SizedBox(
+                                              width: 200,
+                                              child: AutoSizeText(
+                                                offer.itemName,
+                                                maxLines: 3,
+                                              ),
+                                            ),
+                                            Text(offer.shopName),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(right: 10),
+                                      child: Material(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.white,
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            IconButton(
+                                                splashRadius: 60,
+                                                icon: const Icon(Icons
+                                                    .change_circle_outlined),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    listVisible = false;
+                                                  });
+
+                                                  _mainDaoController
+                                                      .addItemToShoppingList(
+                                                          _mainDaoController
+                                                              .choosenShoppingList
+                                                              .value
+                                                              .offerModelList[
+                                                                  widget.index!]
+                                                              .offerListenerEntity
+                                                              .id,
+                                                          offer)
+                                                      .then((value) => _mainDaoController
+                                                          .getAllComplexShoppingListByUser(
+                                                              _userDataController
+                                                                  .user,
+                                                              _mainDaoController
+                                                                  .choosenShoppingList
+                                                                  .value
+                                                                  .id
+                                                                  .oid,
+                                                              true,
+                                                              false,
+                                                              true))
+                                                      .then((value) => _mainDaoController
+                                                          .selectShoppingList(
+                                                              _mainDaoController
+                                                                  .oldShoppingListoid!))
+                                                      .then((value) =>
+                                                          Navigator.pop(
+                                                              context));
+                                                }),
+                                            const Text(
+                                              "Csere",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w200),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      })
+
+                  /*FutureBuilder(
+                    initialData: [],
+                    future: offerList,
+                    builder: (context, snapshot) {
+                      var data = (snapshot.data as List<dynamic>).toList();
+                      if (data.isNotEmpty) {
+                        print('data not empty:${data.length}');
+                        print(snapshot.connectionState);
+                        return ListView.builder(
+                            itemCount: data.length,
+                            itemBuilder: (BuildContext ctx, index) {
+                              return Container(
+                                height: 90,
+                                margin: const EdgeInsets.only(
+                                    bottom: 10, left: 10, right: 10),
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16.0)),
+                                child: Row(
+                                  children: [
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    FutureBuilder(
+                                      future: checkImageUrl(
+                                          'http://95.138.193.102:9988/image_download/${data[index].imageUrl}'),
+                                      builder: ((context, snapshot) {
+                                        if (snapshot.data != null) {
+                                          return FadeInImage(
+                                            width: 70,
+                                            height: 70,
+                                            placeholder: const AssetImage(
+                                                'assets/images/wait.png'),
+                                            image: NetworkImage(
+                                                'http://95.138.193.102:9988/image_download/${data[index].imageUrl}'),
+                                          );
+                                        } else {
+                                          return const Image(
+                                            image: AssetImage(
+                                                'assets/images/image_not_found.png'),
+                                            width: 75,
+                                            height: 75,
+                                          );
+                                        }
+                                      }),
+                                    ),
+                                    Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          '${offer.price},-Ft',
+                                          '${data[index].price},-Ft',
                                           style: const TextStyle(
                                               fontWeight: FontWeight.bold),
                                         ),
                                         SizedBox(
                                           width: 200,
                                           child: AutoSizeText(
-                                            offer.itemName,
+                                            data[index].itemName,
                                             maxLines: 2,
                                           ),
                                         ),
-                                        Text(offer.shopName),
+                                        Text(data[index].shopName),
                                       ],
                                     ),
-                                  ),
-                                  Container(
-                                    margin: EdgeInsets.only(left: 30),
-                                    child: Material(
-                                      borderRadius: BorderRadius.circular(20),
-                                      color: Colors.white,
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          IconButton(
-                                              splashRadius: 60,
-                                              icon: const Icon(
-                                                  Icons.change_circle_outlined),
-                                              onPressed: () {
-                                                _mainDaoController
-                                                    .addItemToShoppingList(
-                                                        _mainDaoController
-                                                            .choosenShoppingList
-                                                            .value
-                                                            .offerModelList[
-                                                                widget.index!]
-                                                            .offerListenerEntity
-                                                            .id,
-                                                        offer)
-                                                    .then((value) => _mainDaoController
-                                                        .getAllComplexShoppingListByUser(
-                                                            _userDataController
-                                                                .user,
-                                                            _mainDaoController
-                                                                .choosenShoppingList
-                                                                .value
-                                                                .id
-                                                                .oid,
-                                                            true,
-                                                            false,
-                                                            true))
-                                                    .then((value) =>
-                                                        _mainDaoController
-                                                            .selectShoppingList(
-                                                                _mainDaoController
-                                                                    .oldShoppingListoid!))
-                                                    .then((value) =>
-                                                        Navigator.pop(context));
-                                              }),
-                                          const Text(
-                                            "Csere",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w200),
-                                          )
-                                        ],
+                                    Container(
+                                      margin: EdgeInsets.only(left: 50),
+                                      child: Material(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.white,
+                                        child: IconButton(
+                                            splashRadius: 60,
+                                            icon: Icon(Icons.add_box_outlined),
+                                            onPressed: () {
+                                              _mongoDaoController
+                                                  .addOfferToShoppingList(
+                                                      data[index],
+                                                      1,
+                                                      _userDataController.user);
+                                              //_mongoDaoController.update();
+                                            }),
                                       ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    })
-
-                /*FutureBuilder(
-                  initialData: [],
-                  future: offerList,
-                  builder: (context, snapshot) {
-                    var data = (snapshot.data as List<dynamic>).toList();
-                    if (data.isNotEmpty) {
-                      print('data not empty:${data.length}');
-                      print(snapshot.connectionState);
-                      return ListView.builder(
-                          itemCount: data.length,
-                          itemBuilder: (BuildContext ctx, index) {
-                            return Container(
-                              height: 90,
-                              margin: const EdgeInsets.only(
-                                  bottom: 10, left: 10, right: 10),
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16.0)),
-                              child: Row(
-                                children: [
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  FutureBuilder(
-                                    future: checkImageUrl(
-                                        'http://95.138.193.102:9988/image_download/${data[index].imageUrl}'),
-                                    builder: ((context, snapshot) {
-                                      if (snapshot.data != null) {
-                                        return FadeInImage(
-                                          width: 70,
-                                          height: 70,
-                                          placeholder: const AssetImage(
-                                              'assets/images/wait.png'),
-                                          image: NetworkImage(
-                                              'http://95.138.193.102:9988/image_download/${data[index].imageUrl}'),
-                                        );
-                                      } else {
-                                        return const Image(
-                                          image: AssetImage(
-                                              'assets/images/image_not_found.png'),
-                                          width: 75,
-                                          height: 75,
-                                        );
-                                      }
-                                    }),
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        '${data[index].price},-Ft',
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      SizedBox(
-                                        width: 200,
-                                        child: AutoSizeText(
-                                          data[index].itemName,
-                                          maxLines: 2,
-                                        ),
-                                      ),
-                                      Text(data[index].shopName),
-                                    ],
-                                  ),
-                                  Container(
-                                    margin: EdgeInsets.only(left: 50),
-                                    child: Material(
-                                      borderRadius: BorderRadius.circular(20),
-                                      color: Colors.white,
-                                      child: IconButton(
-                                          splashRadius: 60,
-                                          icon: Icon(Icons.add_box_outlined),
-                                          onPressed: () {
-                                            _mongoDaoController
-                                                .addOfferToShoppingList(
-                                                    data[index],
-                                                    1,
-                                                    _userDataController.user);
-                                            //_mongoDaoController.update();
-                                          }),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            );
-                          });
-                    } else {
-                      print('if data.length: ${data.length}');
-                      print(snapshot.connectionState);
-                      if (snapshot.connectionState != ConnectionState.waiting) {
-                        return const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 200),
-                          child: Center(
-                            child: SizedBox(
-                              width: 200,
-                              child: Text(
-                                "Nem találtam akciókat! Módosítsd a kereső szót! 😿",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 18,
-                                    color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        );
+                                    )
+                                  ],
+                                ),
+                              );
+                            });
                       } else {
-                        return const Center(child: CircularProgressIndicator());
+                        print('if data.length: ${data.length}');
+                        print(snapshot.connectionState);
+                        if (snapshot.connectionState != ConnectionState.waiting) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 200),
+                            child: Center(
+                              child: SizedBox(
+                                width: 200,
+                                child: Text(
+                                  "Nem találtam akciókat! Módosítsd a kereső szót! 😿",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.normal,
+                                      fontSize: 18,
+                                      color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          );
+                        } else {
+                          return const Center(child: CircularProgressIndicator());
+                        }
                       }
-                    }
-                  })*/
-                )
+                    })*/
+                  ),
+            )
           ],
         ),
       )),

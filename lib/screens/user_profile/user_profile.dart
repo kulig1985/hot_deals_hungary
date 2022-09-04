@@ -91,6 +91,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
+  String checkUserNameExist(User user) {
+    if (user.displayName == "" || user.displayName == null) {
+      return user.email!;
+    } else {
+      return user.displayName!;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,55 +126,63 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ),
                 Center(
                   child: Text(
-                    "Süssön rád a 🌞 kedves ${_userDataController.user.displayName!} a következő azonosítóval tudod megosztani a listáidat. Csak rá kell klikkelj és már is kimaásoltad!",
+                    "Süssön rád a 🌞 kedves ${checkUserNameExist(_userDataController.user)} a következő azonosítóval tudod megosztani a listáidat. Csak rá kell klikkelj és már is kimaásoltad!",
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 20, color: Colors.white),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 40, left: 20, bottom: 40),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SelectableText(
-                        "${_userDataController.user.uid}",
-                        style:
-                            const TextStyle(fontSize: 15, color: Colors.white),
-                        onTap: () {
-                          Clipboard.setData(ClipboardData(
-                              text: _userDataController.user.uid));
-                          Get.snackbar("Másolás!", "User ID lemásolva!",
-                              snackPosition: SnackPosition.TOP,
-                              isDismissible: true,
-                              duration: const Duration(seconds: 1));
-                        },
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 40),
-                        child: Material(
-                          borderRadius: BorderRadius.circular(40),
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () {
-                              Clipboard.setData(ClipboardData(
-                                  text: _userDataController.user.uid));
-                              Get.snackbar("Másolás!", "User ID lemásolva!",
-                                  snackPosition: SnackPosition.TOP,
-                                  isDismissible: true,
-                                  duration: const Duration(seconds: 1));
-                            },
-                            child: const Icon(
-                              Icons.copy,
-                              size: 17,
-                              color: Colors.white,
+                Container(
+                  margin: EdgeInsets.only(left: 10, right: 10),
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.only(top: 40, left: 20, bottom: 40),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Container(
+                            width: 300,
+                            child: SelectableText(
+                              "${_userDataController.user.uid}",
+                              style: const TextStyle(
+                                  fontSize: 15, color: Colors.white),
+                              onTap: () {
+                                Clipboard.setData(ClipboardData(
+                                    text: _userDataController.user.uid));
+                                Get.snackbar("Másolás!", "User ID lemásolva!",
+                                    snackPosition: SnackPosition.TOP,
+                                    isDismissible: true,
+                                    duration: const Duration(seconds: 1));
+                              },
                             ),
                           ),
                         ),
-                      )
-                    ],
+                        Padding(
+                          padding: const EdgeInsets.only(right: 40),
+                          child: Material(
+                            borderRadius: BorderRadius.circular(40),
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                Clipboard.setData(ClipboardData(
+                                    text: _userDataController.user.uid));
+                                Get.snackbar("Másolás!", "User ID lemásolva!",
+                                    snackPosition: SnackPosition.TOP,
+                                    isDismissible: true,
+                                    duration: const Duration(seconds: 1));
+                              },
+                              child: const Icon(
+                                Icons.copy,
+                                size: 17,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
-                Divider(),
                 ElevatedButton.icon(
                   onPressed: () {
                     _signOut();

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hot_deals_hungary/models/mongo/change_offer_on_offer_listener.dart';
 import 'package:hot_deals_hungary/models/mongo/modify_offer_listener.dart';
+import 'package:hot_deals_hungary/models/mongo/modify_shopping_list_entity.dart';
 import 'package:hot_deals_hungary/models/mongo/offer.dart';
 import 'package:hot_deals_hungary/models/mongo/offer_creation_done.dart';
 import 'package:hot_deals_hungary/models/mongo/shopping_list_complex_model.dart';
@@ -28,8 +29,8 @@ class MainDaoController extends GetxController {
 
   final _httpClient = http.Client();
 
-  //final BASE_URL = 'http://95.138.193.102:9988';
-  final BASE_URL = 'http://127.0.0.1:9988';
+  final BASE_URL = 'http://95.138.193.102:9988';
+  //final BASE_URL = 'http://127.0.0.1:9988';
 
   Map<String, String> BASE_HEADER = {
     'Content-type': 'application/json',
@@ -76,6 +77,7 @@ class MainDaoController extends GetxController {
 
       var json = response.body;
       shoppingListOnUser = shoppingListComplexModelFromJson(json);
+      log.d("json" + json);
     } else {
       shoppingListOnUser = [choosenShoppingList.value];
     }
@@ -157,7 +159,7 @@ class MainDaoController extends GetxController {
         crDate: createDateString(),
         offerModelList: [],
         listName:
-            '${user.displayName} listája nr: ${shoppingListNr.toString()}',
+            '${checkUserNameExist(user)} listája nr: ${shoppingListNr.toString()}',
         modDate: createDateString(),
         imageColorIndex: Random().nextInt(4));
 
@@ -459,11 +461,50 @@ class MainDaoController extends GetxController {
   int countSumOfShoppingList(ShoppingListComplexModel shoppingList) {
     int sum = 0;
     for (OfferModelList offerModelList in shoppingList.offerModelList) {
-      sum = sum +
-          offerModelList.offerListenerEntity.itemCount *
-              offerModelList.offers[0].price;
+      try {
+        sum = sum +
+            offerModelList.offerListenerEntity.itemCount *
+                offerModelList.offers[0].price;
+      } catch (e) {
+        sum = sum + 0;
+      }
     }
     return sum;
+  }
+
+  Future<void> removeUserFromShoppingList(
+      User user, String shoppingListOidToRemove) async {
+    print(
+        "removeUserFromShoppingList invoked on shopping list oid: $shoppingListOidToRemove");
+    AlloweUidList alloweUidList = AlloweUidList(
+        uid: user.uid,
+        boolId: 0,
+        crDate: createDateString(),
+        role: 'creator',
+        modDate: createDateString());
+    ModifyShoppingListEntity modifyShoppingListEntity =
+        ModifyShoppingListEntity(
+            id: shoppingListOidToRemove,
+            removeUser: 'Y',
+            alloweUidList: alloweUidList);
+
+    Map<String, dynamic> newShoppingListEntityMap =
+        modifyShoppingListEntity.toJson();
+    var uri = Uri.parse('$BASE_URL/modify_shopping_list');
+
+    var response = await _httpClient.patch(uri,
+        body: jsonEncode(newShoppingListEntityMap), headers: BASE_HEADER);
+  }
+
+  String checkUserNameExist(User user) {
+
+    if (user.displayName == "" || user.displayName == null) {
+      return user.email!.substring(0,user.email!.indexOf("@"));
+    }
+    else {
+      return user.displayName!;
+    }
+
   }
 
   String createDateString() {

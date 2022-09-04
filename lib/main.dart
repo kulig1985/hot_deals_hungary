@@ -23,6 +23,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+        debugShowCheckedModeBanner: false,
       theme: ThemeData(
           textTheme: GoogleFonts.nunitoSansTextTheme(
         Theme.of(context).textTheme,

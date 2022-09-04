@@ -201,7 +201,6 @@ class Offer {
       required this.isSales,
       required this.insertType,
       required this.timeKey,
-      required this.imageColorIndex,
       required this.isSelectedFlag,
       required this.selectedBy});
 
@@ -219,7 +218,6 @@ class Offer {
   int isSales;
   String insertType;
   String timeKey;
-  int imageColorIndex;
   int isSelectedFlag;
   String selectedBy;
 
@@ -238,7 +236,6 @@ class Offer {
       isSales: json["isSales"],
       insertType: json["insertType"],
       timeKey: json["timeKey"],
-      imageColorIndex: json["imageColorIndex"],
       isSelectedFlag: json["isSelectedFlag"],
       selectedBy: json["selectedBy"]);
 
@@ -257,7 +254,6 @@ class Offer {
         "isSales": isSales,
         "insertType": insertType,
         "timeKey": timeKey,
-        "imageColorIndex": imageColorIndex,
         "isSelectedFlag": isSelectedFlag,
         "selectedBy": selectedBy
       };
