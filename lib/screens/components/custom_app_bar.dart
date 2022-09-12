@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutterfire_ui/auth.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:hot_deals_hungary/controllers/mongo_dao_controller.dart';
 import 'package:hot_deals_hungary/controllers/user_controller.dart';
@@ -50,7 +52,19 @@ class _CustomAppBarState extends State<CustomAppBar> {
       builder: (_) => AppBar(
         title: Text(widget.titleName),
         elevation: 3,
-        backgroundColor: const Color.fromRGBO(31, 34, 41, 1),
+        backgroundColor: const Color.fromRGBO(37, 37, 37, 1),
+        actions: [IconButton(
+          iconSize: 20,
+          icon: const FaIcon(FontAwesomeIcons.user),
+          color: Colors.white,
+          onPressed: () {
+
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const UserProfileScreen()));
+          },
+        )],
         /*actions: [
           Container(
             margin: EdgeInsets.only(right: 20),

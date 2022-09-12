@@ -511,7 +511,7 @@ class MongoDaoController extends GetxController {
     ModifyShoppingListEntity modifyShoppingListEntity =
         ModifyShoppingListEntity(
             id: shoppingListOidToRemove,
-            removeUser: 'Y',
+            operationName: 'Y',
             alloweUidList: alloweUidList);
 
     Map<String, dynamic> newShoppingListEntityMap =
@@ -758,7 +758,7 @@ class MongoDaoController extends GetxController {
     ModifyShoppingListEntity modifyShoppingListEntity =
         ModifyShoppingListEntity(
             id: rxShoppingList.value.id.oid,
-            removeUser: 'N',
+            operationName: 'N',
             boolId: rxShoppingList.value.boolId,
             alloweUidList: alloweUidList);
 

@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hot_deals_hungary/auth/auth_gate.dart';
 import 'package:hot_deals_hungary/controllers/user_controller.dart';
 import 'package:hot_deals_hungary/screens/components/bottom_bar.dart';
@@ -20,13 +21,15 @@ class UserProfileScreen extends StatefulWidget {
 class _UserProfileScreenState extends State<UserProfileScreen> {
   final UserDataController _userDataController = Get.find();
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  //final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<void> _signOut() async {
-    await _auth.signOut().then((value) => Navigator.pushAndRemoveUntil(
+    await FirebaseAuth.instance.signOut();
+
+    Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => AuthGate()),
-        ModalRoute.withName("/auth")));
+        ModalRoute.withName("/auth"));
   }
 
   Widget showProfilScreen() {
@@ -113,7 +116,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             child: Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
-          color: const Color.fromRGBO(43, 47, 58, 1),
+          color: const Color.fromRGBO(37, 37, 37, 1),
           child: Stack(children: [
             Column(
               children: [
@@ -184,8 +187,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   ),
                 ),
                 ElevatedButton.icon(
-                  onPressed: () {
-                    _signOut();
+                  onPressed: () async {
+                    await _signOut();
                   },
                   icon: const Icon(Icons.logout),
                   label: const Text("Kilépés"),

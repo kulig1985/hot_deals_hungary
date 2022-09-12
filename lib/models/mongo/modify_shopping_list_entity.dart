@@ -13,30 +13,36 @@ String modifyShoppingListEntityToJson(ModifyShoppingListEntity data) =>
     json.encode(data.toJson());
 
 class ModifyShoppingListEntity {
-  ModifyShoppingListEntity({
-    required this.id,
-    this.alloweUidList,
-    required this.removeUser,
-    this.boolId,
-  });
+  ModifyShoppingListEntity(
+      {required this.id,
+      this.alloweUidList,
+      required this.operationName,
+      this.boolId,
+      this.listName,
+      this.modDate});
 
   String id;
   AlloweUidList? alloweUidList;
-  String removeUser;
+  String operationName;
   int? boolId;
+  String? listName;
+  String? modDate;
 
   factory ModifyShoppingListEntity.fromJson(Map<String, dynamic> json) =>
       ModifyShoppingListEntity(
-        id: json["id"],
-        alloweUidList: AlloweUidList.fromJson(json["alloweUidList"]),
-        removeUser: json["removeUser"],
-        boolId: json["boolId"],
-      );
+          id: json["id"],
+          alloweUidList: AlloweUidList.fromJson(json["alloweUidList"]),
+          operationName: json["operationName"],
+          boolId: json["boolId"],
+          listName: json["listName"],
+          modDate: json["modDate"]);
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "alloweUidList": alloweUidList?.toJson(),
-        "removeUser": removeUser,
+        "operationName": operationName,
         "boolId": boolId,
+        "listName": listName,
+        "modDate": modDate
       };
 }

@@ -9,6 +9,8 @@ import 'package:hot_deals_hungary/screens/action_listener/action_listener_page.d
 import 'package:hot_deals_hungary/screens/navigation/navigation_persistent_screen.dart';
 import 'package:hot_deals_hungary/screens/navigation/navigation_screen.dart';
 
+import '../screens/shopping_list/list_of_shopping_list.dart';
+
 class AuthGate extends StatefulWidget {
   const AuthGate({Key? key}) : super(key: key);
 
@@ -28,15 +30,16 @@ class _AuthGateState extends State<AuthGate> {
                   EmailProviderConfiguration(),
                   GoogleProviderConfiguration(
                       clientId:
-                          '1028524662787-4rv061tnikes9eovpvjf0m0no2qmpecv.apps.googleusercontent.com')
+                          '1028524662787-4rv061tnikes9eovpvjf0m0no2qmpecv.apps.googleusercontent.com'),
+                  FacebookProviderConfiguration(clientId: '3249979211885631')
                 ],
                 headerBuilder: (context, constraints, _) {
                   return Container(
                     margin: EdgeInsets.only(top: 30),
                     child: const Image(
-                      image: AssetImage('assets/images/logo.png'),
-                      width: 100,
-                      height: 100,
+                      image: AssetImage('assets/images/shopping_list_logo.png'),
+                      width: 80,
+                      height: 80,
                     ),
                   );
                 });
@@ -47,7 +50,7 @@ class _AuthGateState extends State<AuthGate> {
                 Get.put(MongoDaoController());
             MainDaoController _mainDaoController = Get.put(MainDaoController());
             //return const ActionListenerPage();
-            return const NavigationPersistentScreen();
+            return const ListOfShoppingListScreen();
             //return const NavigationPage();
           }
         });

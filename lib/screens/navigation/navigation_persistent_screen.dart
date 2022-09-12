@@ -54,7 +54,7 @@ class _NavigationPersistentScreenState
       body: PersistentTabView(
         context,
         controller: _controller,
-        backgroundColor: Color.fromRGBO(31, 34, 41, 1),
+        backgroundColor: const Color.fromRGBO(37, 37, 37, 1),
         screens: const [
           ListOfShoppingListScreen(),
           UserProfileScreen(),

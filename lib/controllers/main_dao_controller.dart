@@ -10,6 +10,7 @@ import 'package:hot_deals_hungary/models/mongo/modify_shopping_list_entity.dart'
 import 'package:hot_deals_hungary/models/mongo/offer.dart';
 import 'package:hot_deals_hungary/models/mongo/offer_creation_done.dart';
 import 'package:hot_deals_hungary/models/mongo/shopping_list_complex_model.dart';
+import 'package:hot_deals_hungary/models/mongo/shopping_list_creation_done.dart';
 import 'package:hot_deals_hungary/models/mongo/shopping_list_entity.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -53,6 +54,7 @@ class MainDaoController extends GetxController {
   get shoppingListOnUserLength => _shoppingListOnUser.length;
   String? oldShoppingListoid;
   OfferListenerEntity? lastCreatedofferListenerEntity;
+  String? lastCreatedShoppingListId;
 
   Future<List<ShoppingListComplexModel>> getAllComplexShoppingListByUser(
       User user,
@@ -61,12 +63,16 @@ class MainDaoController extends GetxController {
       bool refreshJustadded,
       bool refreshShoppingList) async {
     String url = "";
-    List<ShoppingListComplexModel> shoppingListOnUser;
+    List<ShoppingListComplexModel> shoppingListOnUserLocal;
+
+    log.d("getAllComplexShoppingListByUser invoked");
 
     if (refreshShoppingList) {
       if (shoppingListId != null) {
+        log.d("shoppingListId not null: $shoppingListId");
         url = '$BASE_URL/get_shopping_list_by_user/${user.uid}/$shoppingListId';
       } else {
+        log.d("shoppingListId IS null");
         url = '$BASE_URL/get_shopping_list_by_user/${user.uid}/none';
       }
 
@@ -76,14 +82,14 @@ class MainDaoController extends GetxController {
       log.d('getAllComplexShoppingListByUser invoked with uid: ${user.uid}');
 
       var json = response.body;
-      shoppingListOnUser = shoppingListComplexModelFromJson(json);
+      shoppingListOnUserLocal = shoppingListComplexModelFromJson(json);
       log.d("json" + json);
     } else {
-      shoppingListOnUser = [choosenShoppingList.value];
+      shoppingListOnUserLocal = [choosenShoppingList.value];
     }
-
+    /*
     if (refreshOffers) {
-      for (ShoppingListComplexModel shoppingList in shoppingListOnUser) {
+      for (ShoppingListComplexModel shoppingList in shoppingListOnUserLocal) {
         for (OfferModelList offerModelList in shoppingList.offerModelList) {
           if (refreshJustadded) {
             if (offerModelList.offerListenerEntity.id ==
@@ -112,15 +118,89 @@ class MainDaoController extends GetxController {
         shoppingList.offerModelList.sort((b, a) => a.offerListenerEntity.crDate
             .compareTo(b.offerListenerEntity.crDate));
       }
-    }
+    }*/
 
     log.d(
         "shoppingListEntityListResponse length: ${shoppingListOnUser.length}");
 
     _shoppingListOnUser.clear();
-    _shoppingListOnUser.assignAll(shoppingListOnUser);
+    _shoppingListOnUser.assignAll(shoppingListOnUserLocal);
 
-    return shoppingListOnUser;
+    log.d("getAllComplexShoppingListByUser finished response!!");
+
+    return shoppingListOnUserLocal;
+  }
+
+  Future<void> selectShoppingList(String oid) async {
+    log.d('selectShoppingList with oid:$oid');
+
+    oldShoppingListoid = oid;
+
+    ShoppingListComplexModel foundShoppingList =
+        _shoppingListOnUser.firstWhere((element) => element.id.oid == oid);
+    choosenShoppingList = Rx(foundShoppingList);
+
+    log.d("selectShoppingList finished!!");
+
+    /*await Future.wait(choosenShoppingList.value.offerModelList
+        .map((i) async => await loadOffersOnChoosenList(i)));*/
+
+    /*for (OfferModelList offerModelList
+        in choosenShoppingList.value.offerModelList) {
+      log.d("start call loadOffersOnChoosenList");
+      await loadOffersOnChoosenList(offerModelList);
+    }*/
+
+    /*for (var offerModelList in choosenShoppingList.value.offerModelList) {
+      await loadOffersOnChoosenList(offerModelList);
+    }*/
+
+    lastCreatedofferListenerEntity;
+
+    List mappedList = await Future.wait(choosenShoppingList.value.offerModelList
+        .map((i) async => await getOffers(i.offerListenerEntity.itemName)));
+
+    /*choosenShoppingList.value.offerModelList.map(
+        (e) => e.offers.removeWhere((element) => element.isSelectedFlag == 0));*/
+
+    for (OfferModelList offerModelList
+        in choosenShoppingList.value.offerModelList) {
+      offerModelList.offers
+          .removeWhere((element) => element.isSelectedFlag == 0);
+    }
+
+    for (var i = 0; i < mappedList.length; i++) {
+      log.d(
+          "offer len remove:${choosenShoppingList.value.offerModelList[i].offers.length} adding:${mappedList[i].length.toString()} element..");
+      choosenShoppingList.value.offerModelList[i].offers.addAll(mappedList[i]);
+    }
+
+    choosenShoppingList.value.offerModelList.sort((b, a) =>
+        a.offerListenerEntity.crDate.compareTo(b.offerListenerEntity.crDate));
+
+    //update();
+  }
+
+  Future<void> loadOffersOnChoosenList(OfferModelList offerModelList) async {
+    log.d("loop");
+    log.d("itemName:${offerModelList.offerListenerEntity.itemName}");
+    offerModelList.offers
+        .addAll(await getOffers(offerModelList.offerListenerEntity.itemName));
+
+/*
+    offerModelList.offers.addAll(await Future.wait(choosenShoppingList
+        .value.offerModelList
+        .map((i) async => await getOffers(i.offerListenerEntity.itemName))));
+
+    List mappedList = await Future.wait(choosenShoppingList.value.offerModelList
+        .map((i) async => await getOffers(i.offerListenerEntity.itemName)));
+
+    for (var element in mappedList) {
+      List<Offer> offers = element;
+      for (var offer in offers) {
+        log.d("element: ${offer.itemName}");
+      }
+    }*/
   }
 
   Future<List<Offer>> getOffers(String itemCleanName) async {
@@ -137,12 +217,12 @@ class MainDaoController extends GetxController {
 
     print("offerList size: ${offerList.length}");
 
-    update();
+    //update();
 
     return offerList;
   }
 
-  Future<void> createNewShoppingList(User user) async {
+  Future<String> createNewShoppingList(User user) async {
     AllowedUidList allowedUidList = AllowedUidList(
         uid: user.uid,
         boolId: 1,
@@ -184,21 +264,45 @@ class MainDaoController extends GetxController {
 
     log.d('new Shopping list done:$json');
 
+    ShoppingListCreationDoneEntity shoppingListCreationDoneEntity =
+        shoppingListCreationDoneEntityFromJson(json);
+
+    lastCreatedShoppingListId = shoppingListCreationDoneEntity.id;
+
+    return shoppingListCreationDoneEntity.id;
+
     //return shoppingListCreationDoneEntity;
   }
 
-  selectShoppingList(String oid) {
-    log.d('selectShoppingList with oid:$oid');
+  Future<void> addUserToShoppingList(User user, String shoppingListId) async {
+    log.d("addUserToShoppingList invoked on list: " + shoppingListId);
+    AlloweUidList alloweUidList = AlloweUidList(
+        uid: user.uid,
+        boolId: 1,
+        crDate: createDateString(),
+        modDate: createDateString(),
+        role: 'subscriber');
 
-    oldShoppingListoid = oid;
+    ModifyShoppingListEntity modifyShoppingListEntity =
+        ModifyShoppingListEntity(
+            id: shoppingListId,
+            operationName: 'ADD_USER',
+            boolId: 1,
+            modDate: createDateString(),
+            alloweUidList: alloweUidList);
 
-    for (ShoppingListComplexModel shoppingList in shoppingListOnUser) {
-      if (shoppingList.id.oid == oid) {
-        choosenShoppingList = Rx(shoppingList);
-      }
-    }
+    Map<String, dynamic> newShoppingListEntityMap =
+        modifyShoppingListEntity.toJson();
 
-    //update();
+    newShoppingListEntityMap.remove("boolId");
+    newShoppingListEntityMap.remove("listName");
+
+    var uri = Uri.parse('$BASE_URL/modify_shopping_list');
+
+    var response = await _httpClient.patch(uri,
+        body: jsonEncode(newShoppingListEntityMap), headers: BASE_HEADER);
+
+    log.d("addUserToShoppingList finished response:$response");
   }
 
   Future<void> createOfferListener(String listItemName,
@@ -354,6 +458,29 @@ class MainDaoController extends GetxController {
         a.offerListenerEntity.crDate.compareTo(b.offerListenerEntity.crDate));
   }
 
+  Future<void> removeItemFromShoppingList(String offerListenerEntityId) async {
+    ModifyOfferListener modifyOfferListener = ModifyOfferListener(
+        id: choosenShoppingList.value.id.oid,
+        offerListenerEntityId: offerListenerEntityId);
+
+    modifyOfferListener.boolId = 0;
+
+    Map<String, dynamic> modifyOfferListenerEntityMap =
+        modifyOfferListener.toJson();
+
+    modifyOfferListenerEntityMap.remove("checkFlag");
+    modifyOfferListenerEntityMap.remove("itemCount");
+
+    log.d(modifyOfferListenerEntityMap);
+
+    var uri = Uri.parse('$BASE_URL/modify_shopping_list_item');
+
+    var response = await _httpClient.patch(uri,
+        body: jsonEncode(modifyOfferListenerEntityMap), headers: BASE_HEADER);
+
+    log.d("response:${response.body}");
+  }
+
   Future<void> addItemToShoppingList(
       String offerListenerEntityId, Offer offer) async {
     offer.isSelectedFlag = 1;
@@ -458,9 +585,10 @@ class MainDaoController extends GetxController {
         a.offerListenerEntity.crDate.compareTo(b.offerListenerEntity.crDate));
   }
 
-  int countSumOfShoppingList(ShoppingListComplexModel shoppingList) {
+  int countSumOfShoppingList() {
     int sum = 0;
-    for (OfferModelList offerModelList in shoppingList.offerModelList) {
+    for (OfferModelList offerModelList
+        in choosenShoppingList.value.offerModelList) {
       try {
         sum = sum +
             offerModelList.offerListenerEntity.itemCount *
@@ -485,7 +613,7 @@ class MainDaoController extends GetxController {
     ModifyShoppingListEntity modifyShoppingListEntity =
         ModifyShoppingListEntity(
             id: shoppingListOidToRemove,
-            removeUser: 'Y',
+            operationName: 'REMOVE_USER',
             alloweUidList: alloweUidList);
 
     Map<String, dynamic> newShoppingListEntityMap =
@@ -496,15 +624,34 @@ class MainDaoController extends GetxController {
         body: jsonEncode(newShoppingListEntityMap), headers: BASE_HEADER);
   }
 
-  String checkUserNameExist(User user) {
+  Future<void> changeShoppingListName(String listName) async {
+    ModifyShoppingListEntity modifyShoppingListEntity =
+        ModifyShoppingListEntity(
+            id: choosenShoppingList.value.id.oid,
+            operationName: 'LIST_RENAME',
+            listName: listName,
+            modDate: createDateString());
 
+    Map<String, dynamic> newShoppingListEntityMap =
+        modifyShoppingListEntity.toJson();
+
+    newShoppingListEntityMap.remove("alloweUidList");
+    newShoppingListEntityMap.remove("boolId");
+
+    log.d("newShoppingListEntityMap: $newShoppingListEntityMap");
+
+    var uri = Uri.parse('$BASE_URL/modify_shopping_list');
+
+    var response = await _httpClient.patch(uri,
+        body: jsonEncode(newShoppingListEntityMap), headers: BASE_HEADER);
+  }
+
+  String checkUserNameExist(User user) {
     if (user.displayName == "" || user.displayName == null) {
-      return user.email!.substring(0,user.email!.indexOf("@"));
-    }
-    else {
+      return user.email!.substring(0, user.email!.indexOf("@"));
+    } else {
       return user.displayName!;
     }
-
   }
 
   String createDateString() {

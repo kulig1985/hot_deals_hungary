@@ -1,8 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hot_deals_hungary/auth/auth_gate.dart';
+import 'package:hot_deals_hungary/auth/login_page.dart';
 import 'package:hot_deals_hungary/firebase_options.dart';
 import 'package:hot_deals_hungary/screens/action_listener/action_listener_page.dart';
 import 'package:hot_deals_hungary/screens/navigation/navigation_persistent_screen.dart';
@@ -13,6 +15,11 @@ import 'package:hot_deals_hungary/screens/user_profile/user_profile.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
   runApp(const MyApp());
 }
 
@@ -23,11 +30,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-        debugShowCheckedModeBanner: false,
-      theme: ThemeData(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(fontFamily: 'Gotham'),
+      /*theme: ThemeData(
           textTheme: GoogleFonts.nunitoSansTextTheme(
         Theme.of(context).textTheme,
-      )),
+      )),*/
       home: const AuthGate(),
       routes: {
         "/home": (_) => NavigationPersistentScreen(),
@@ -35,6 +43,20 @@ class MyApp extends StatelessWidget {
         "/auth": (_) => AuthGate(),
         "/cart": (_) => ShoppingListGroupView(),
       },
+      builder: (context, child) {
+        return ScrollConfiguration(
+          behavior: MyBehavior(),
+          child: child!,
+        );
+      },
     );
+  }
+}
+
+class MyBehavior extends ScrollBehavior {
+  @override
+  Widget buildOverscrollIndicator(
+      BuildContext context, Widget child, ScrollableDetails details) {
+    return child;
   }
 }

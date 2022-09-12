@@ -287,31 +287,35 @@ class _SearchOffersPageState extends State<SearchOffersPage> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    FutureBuilder(
-                                      future: checkImageUrl(
-                                          'http://95.138.193.102:9988/image_download/${offer.imageUrl}'),
-                                      builder: ((context, snapshot) {
-                                        if (snapshot.data != null) {
-                                          return FadeInImage(
-                                            width: 100,
-                                            height: 100,
-                                            placeholder: const AssetImage(
-                                                'assets/images/wait.png'),
-                                            image: NetworkImage(
-                                                'http://95.138.193.102:9988/image_download/${offer.imageUrl}'),
-                                          );
-                                        } else {
-                                          return const Image(
-                                            image: AssetImage(
-                                                'assets/images/image_not_found.png'),
-                                            width: 75,
-                                            height: 75,
-                                          );
-                                        }
-                                      }),
+                                    Container(
+                                      margin: EdgeInsets.only(left: 5),
+                                      child: FutureBuilder(
+                                        future: checkImageUrl(
+                                            'http://95.138.193.102:9988/image_download/${offer.imageUrl}'),
+                                        builder: ((context, snapshot) {
+                                          if (snapshot.data != null) {
+                                            return FadeInImage(
+                                              width: 100,
+                                              height: 100,
+                                              placeholder: const AssetImage(
+                                                  'assets/images/wait.png'),
+                                              image: NetworkImage(
+                                                  'http://95.138.193.102:9988/image_download/${offer.imageUrl}'),
+                                            );
+                                          } else {
+                                            return const Image(
+                                              image: AssetImage(
+                                                  'assets/images/image_not_found.png'),
+                                              width: 75,
+                                              height: 75,
+                                            );
+                                          }
+                                        }),
+                                      ),
                                     ),
                                     Expanded(
                                       child: Container(
+                                        margin: EdgeInsets.only(left: 20),
                                         width: 200,
                                         child: Column(
                                           crossAxisAlignment:
