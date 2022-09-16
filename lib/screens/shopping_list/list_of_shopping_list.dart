@@ -211,7 +211,7 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen> {
         .firstWhereOrNull(
             (element) => element.uid != _userDataController.user.uid);
     if (alloweUidList != null) {
-      return const Icon(Icons.share, color: Colors.white);
+      return const Icon(Icons.share, color: Colors.black);
     } else {
       return Container();
     }
@@ -321,6 +321,8 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen> {
                             child: Container(
                               height: 165,
                               decoration: BoxDecoration(
+                                  border:
+                                      Border.all(color: Colors.white, width: 2),
                                   color: const Color.fromRGBO(104, 237, 173, 1),
                                   borderRadius: BorderRadius.circular(15.0)),
                               margin: const EdgeInsets.only(
@@ -337,14 +339,14 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen> {
                                       padding: EdgeInsets.only(
                                           top: 10, left: 0, bottom: 10),
                                       child: Icon(
-                                        Icons.list_alt,
-                                        color: Colors.white,
+                                        Icons.add,
+                                        color: Colors.black,
                                       ),
                                     ),
                                     Text(
                                       "Új bevásárló lista létrehozása! ",
                                       style: TextStyle(
-                                          color: Colors.white,
+                                          color: Colors.black,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 18),
                                     ),
@@ -408,7 +410,9 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(15.0),
                                   ),
-                                  color: colors[data[index].imageColorIndex],
+                                  color: colors[
+                                      ((index / 5 - (index / 5).floor()) * 5)
+                                          .toInt()],
                                   child: Container(
                                       child: GestureDetector(
                                     onTap: () async {
@@ -447,14 +451,13 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen> {
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                     style: const TextStyle(
-                                                        color: Colors.white,
+                                                        color: Colors.black,
                                                         fontSize: 20.0,
                                                         fontWeight:
                                                             FontWeight.bold),
                                                   ),
                                                 ),
-                                              ),
-                                              checkSharedList(data[index])
+                                              )
                                             ],
                                           ),
                                         ),
@@ -465,11 +468,12 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen> {
                                             child: Text(
                                               "${data[index].offerModelList.length} db termék",
                                               style: const TextStyle(
-                                                  color: Colors.white,
+                                                  color: Colors.black,
                                                   fontWeight: FontWeight.bold),
                                             ),
                                           ),
                                         ),
+
                                         /*Expanded(
                                           child: Padding(
                                             padding: const EdgeInsets.only(
@@ -486,14 +490,14 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
-                                            const Padding(
+                                            /*const Padding(
                                               padding: EdgeInsets.only(
                                                   top: 0, left: 10, bottom: 0),
                                               child: FaIcon(
                                                 FontAwesomeIcons.listCheck,
                                                 color: Colors.white,
                                               ),
-                                            ),
+                                            ),*/
                                             Padding(
                                               padding: const EdgeInsets.only(
                                                   top: 0, right: 10, bottom: 0),
@@ -502,7 +506,7 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen> {
                                                       43, 47, 58, 1),
                                                   icon: const FaIcon(
                                                     FontAwesomeIcons.ellipsis,
-                                                    color: Colors.white,
+                                                    color: Colors.black,
                                                   ),
                                                   itemBuilder: (context) {
                                                     return List.generate(
@@ -555,7 +559,13 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen> {
                                                           'hotdeal://kebodev.hu/?shoppingList=${data[index].id.oid}');
                                                     }
                                                   }),
-                                            )
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 10),
+                                              child:
+                                                  checkSharedList(data[index]),
+                                            ),
                                           ],
                                         ),
                                       ],

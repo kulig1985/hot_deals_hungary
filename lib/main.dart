@@ -9,6 +9,7 @@ import 'package:hot_deals_hungary/firebase_options.dart';
 import 'package:hot_deals_hungary/screens/action_listener/action_listener_page.dart';
 import 'package:hot_deals_hungary/screens/navigation/navigation_persistent_screen.dart';
 import 'package:hot_deals_hungary/screens/navigation/navigation_screen.dart';
+import 'package:hot_deals_hungary/screens/shopping_list/list_of_shopping_list.dart';
 import 'package:hot_deals_hungary/screens/shopping_list/shopping_list_group_view.dart';
 import 'package:hot_deals_hungary/screens/user_profile/user_profile.dart';
 
@@ -38,15 +39,20 @@ class MyApp extends StatelessWidget {
       )),*/
       home: const AuthGate(),
       routes: {
-        "/home": (_) => NavigationPersistentScreen(),
-        "/user_profile": (_) => UserProfileScreen(),
-        "/auth": (_) => AuthGate(),
-        "/cart": (_) => ShoppingListGroupView(),
+        "/home": (_) => const ListOfShoppingListScreen(),
+        "/user_profile": (_) => const UserProfileScreen(),
+        "/auth": (_) => const AuthGate(),
+        "/cart": (_) => const ShoppingListGroupView(),
       },
       builder: (context, child) {
-        return ScrollConfiguration(
-          behavior: MyBehavior(),
-          child: child!,
+        final mediaQueryData = MediaQuery.of(context);
+
+        return MediaQuery(
+          data: mediaQueryData.copyWith(textScaleFactor: 1.0),
+          child: ScrollConfiguration(
+            behavior: MyBehavior(),
+            child: child!,
+          ),
         );
       },
     );

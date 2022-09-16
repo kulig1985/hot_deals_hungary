@@ -13,7 +13,7 @@ import 'package:hot_deals_hungary/screens/action_listener/search_offer_new_page.
 import 'package:hot_deals_hungary/screens/components/custom_app_bar.dart';
 import 'package:hot_deals_hungary/screens/components/custom_page_route.dart';
 import 'package:logger/logger.dart';
-import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:roundcheckbox/roundcheckbox.dart';
 import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 import 'package:http/http.dart' as http;
@@ -132,7 +132,7 @@ class _ShoppingListGroupViewState extends State<ShoppingListGroupView> {
       var emptyOffer = Offer(
           id: "0",
           itemId: -1,
-          itemName: "Nincsenek akciók",
+          itemName: "",
           itemCleanName: "Nincsenek akciók",
           imageUrl: "na",
           price: 0,
@@ -140,7 +140,7 @@ class _ShoppingListGroupViewState extends State<ShoppingListGroupView> {
           salesStart: "na",
           source: "na",
           runDate: "na",
-          shopName: "Nincsenek akciók",
+          shopName: "-",
           isSales: 0,
           insertType: "na",
           timeKey: "na",
@@ -152,6 +152,30 @@ class _ShoppingListGroupViewState extends State<ShoppingListGroupView> {
       log.d("returning emptyOfferList length: ${emptyOfferList.length}");
 
       return emptyOfferList;
+    }
+  }
+
+  String existSelectedOffer(OfferModelList offerModelList) {
+    Offer? offer = offerModelList.offers
+        .firstWhereOrNull((element) => element.isSelectedFlag == 1);
+    if (offer != null) {
+      return offer.itemCleanName;
+    } else {
+      if (offerModelList.offers.isNotEmpty) {
+        return "${offerModelList.offers.length} találat ${offerModelList.offers[0].price} Ft-tól";
+      } else {
+        return "Nincsenek akciók";
+      }
+    }
+  }
+
+  String selectedShopName(OfferModelList offerModelList) {
+    Offer? offer = offerModelList.offers
+        .firstWhereOrNull((element) => element.isSelectedFlag == 1);
+    if (offer != null) {
+      return "${offer.shopName} - ";
+    } else {
+      return "";
     }
   }
 
@@ -169,10 +193,18 @@ class _ShoppingListGroupViewState extends State<ShoppingListGroupView> {
     super.dispose();
   }
 
+  var colors = [
+    Color.fromRGBO(255, 204, 128, 1),
+    Color.fromRGBO(207, 147, 217, 1),
+    Color.fromRGBO(230, 238, 155, 1),
+    Color.fromRGBO(124, 223, 232, 1),
+    Color.fromRGBO(255, 171, 145, 1),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    final PersistentTabController _controller =
-        PersistentTabController(initialIndex: 0);
+    /*final PersistentTabController _controller =
+        PersistentTabController(initialIndex: 0);*/
 
     listNameTextController.text =
         _mainDaoController.choosenShoppingList.value.listName;
@@ -395,235 +427,242 @@ class _ShoppingListGroupViewState extends State<ShoppingListGroupView> {
                                         ),
                                       ),
                                       child: Container(
-                                        color: Color.fromRGBO(23, 23, 23, 1),
-                                        margin: EdgeInsets.only(top: 5),
-                                        child: Column(children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  const SizedBox(
-                                                    width: 20,
+                                        decoration: BoxDecoration(
+                                            color: colors[((index / 5 -
+                                                        (index / 5).floor()) *
+                                                    5)
+                                                .toInt()],
+                                            borderRadius:
+                                                const BorderRadius.horizontal(
+                                                    left: Radius.circular(5),
+                                                    right: Radius.circular(5))),
+                                        margin: const EdgeInsets.only(top: 5),
+                                        child: Container(
+                                          margin:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                RoundCheckBox(
+                                                    size: 18,
+                                                    uncheckedColor:
+                                                        const Color.fromRGBO(
+                                                            43, 47, 58, 1),
+                                                    checkedColor:
+                                                        const Color.fromRGBO(
+                                                            104, 237, 173, 1),
+                                                    isChecked: ischecked(
+                                                        _mainDaoController
+                                                            .choosenShoppingList
+                                                            .value
+                                                            .offerModelList[
+                                                                index]
+                                                            .offerListenerEntity
+                                                            .checkFlag!),
+                                                    onTap: (_) {
+                                                      log.d("onTap invoked!");
+                                                      _mainDaoController.modifyCheckFlagOnOfferListener(
+                                                          _mainDaoController
+                                                              .choosenShoppingList
+                                                              .value
+                                                              .offerModelList[
+                                                                  index]
+                                                              .offerListenerEntity
+                                                              .id,
+                                                          _mainDaoController
+                                                              .choosenShoppingList
+                                                              .value
+                                                              .offerModelList[
+                                                                  index]
+                                                              .offerListenerEntity
+                                                              .checkFlag!,
+                                                          index);
+                                                    }),
+                                                Container(
+                                                  margin: const EdgeInsets.only(
+                                                      left: 24,
+                                                      top: 5,
+                                                      bottom: 5),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .only(
+                                                                top: 0,
+                                                                bottom: 3),
+                                                        child: Text(
+                                                          selectedShopName(
+                                                                  _mainDaoController
+                                                                          .choosenShoppingList
+                                                                          .value
+                                                                          .offerModelList[
+                                                                      index]) +
+                                                              _mainDaoController
+                                                                  .choosenShoppingList
+                                                                  .value
+                                                                  .offerModelList[
+                                                                      index]
+                                                                  .offerListenerEntity
+                                                                  .itemName,
+                                                          style:
+                                                              const TextStyle(
+                                                                  color: Colors
+                                                                      .black,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 18),
+                                                        ),
+                                                      ),
+                                                      /*Text(
+                                                        "${checkIfOfferListEmpty(_mainDaoController.choosenShoppingList.value.offerModelList[index].offers)[0].price * _mainDaoController.choosenShoppingList.value.offerModelList[index].offerListenerEntity.itemCount} Ft - ${checkIfOfferListEmpty(_mainDaoController.choosenShoppingList.value.offerModelList[index].offers)[0].shopName}",
+                                                        style: const TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .normal),
+                                                      ),*/
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          GestureDetector(
+                                                            onTap: () async {
+                                                              await Navigator.push(
+                                                                      context,
+                                                                      CustomPageRoute(
+                                                                          child: SearchOffersPage(
+                                                                              index:
+                                                                                  index,
+                                                                              itemCleanName: _mainDaoController
+                                                                                  .choosenShoppingList
+                                                                                  .value
+                                                                                  .offerModelList[
+                                                                                      index]
+                                                                                  .offerListenerEntity
+                                                                                  .itemName)))
+                                                                  .then((value) =>
+                                                                      _mainDaoController
+                                                                          .update())
+                                                                  .then((value) =>
+                                                                      setState(
+                                                                        () {},
+                                                                      ));
+                                                            },
+                                                            child: Container(
+                                                              width: 230,
+                                                              margin:
+                                                                  const EdgeInsets
+                                                                          .only(
+                                                                      left: 0),
+                                                              child: Text(
+                                                                existSelectedOffer(
+                                                                    _mainDaoController
+                                                                        .choosenShoppingList
+                                                                        .value
+                                                                        .offerModelList[index]),
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                style: const TextStyle(
+                                                                    decoration:
+                                                                        TextDecoration
+                                                                            .underline,
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .normal,
+                                                                    fontSize:
+                                                                        16),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      )
+                                                    ],
                                                   ),
-                                                  Obx(
-                                                    () => RoundCheckBox(
-                                                        size: 25,
-                                                        uncheckedColor:
-                                                            const Color.fromRGBO(
-                                                                43, 47, 58, 1),
-                                                        checkedColor:
-                                                            const Color
-                                                                    .fromRGBO(
-                                                                111,
-                                                                181,
-                                                                139,
-                                                                1),
-                                                        isChecked: ischecked(
+                                                ),
+                                                Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    IconButton(
+                                                      onPressed: () {
+                                                        if (_mainDaoController
+                                                                .choosenShoppingList
+                                                                .value
+                                                                .offerModelList[
+                                                                    index]
+                                                                .offerListenerEntity
+                                                                .itemCount >
+                                                            1) {
+                                                          log.d(
+                                                              "onTap invoked!");
+                                                          _mainDaoController
+                                                              .modifyItemCountOnOfferListener(
+                                                                  _mainDaoController
+                                                                      .choosenShoppingList
+                                                                      .value
+                                                                      .offerModelList[
+                                                                          index]
+                                                                      .offerListenerEntity
+                                                                      .id,
+                                                                  -1,
+                                                                  index)
+                                                              .then((value) =>
+                                                                  _mainDaoController
+                                                                      .update());
+                                                        }
+                                                      },
+                                                      icon: const Icon(
+                                                        Icons.remove_circle,
+                                                        size: 22,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      height: 20,
+                                                      width: 20,
+                                                      decoration: const BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                  Radius
+                                                                      .circular(
+                                                                          5)),
+                                                          color: Color.fromRGBO(
+                                                              31, 36, 43, 1)),
+                                                      child: Center(
+                                                        child: GetBuilder<
+                                                            MainDaoController>(
+                                                          builder: (_) => Text(
                                                             _mainDaoController
                                                                 .choosenShoppingList
                                                                 .value
                                                                 .offerModelList[
                                                                     index]
                                                                 .offerListenerEntity
-                                                                .checkFlag!),
-                                                        onTap: (_) {
-                                                          log.d(
-                                                              "onTap invoked!");
-                                                          _mainDaoController.modifyCheckFlagOnOfferListener(
-                                                              _mainDaoController
-                                                                  .choosenShoppingList
-                                                                  .value
-                                                                  .offerModelList[
-                                                                      index]
-                                                                  .offerListenerEntity
-                                                                  .id,
-                                                              _mainDaoController
-                                                                  .choosenShoppingList
-                                                                  .value
-                                                                  .offerModelList[
-                                                                      index]
-                                                                  .offerListenerEntity
-                                                                  .checkFlag!,
-                                                              index);
-                                                        }),
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 20,
-                                                  ),
-                                                  Text(
-                                                    _mainDaoController
-                                                        .choosenShoppingList
-                                                        .value
-                                                        .offerModelList[index]
-                                                        .offerListenerEntity
-                                                        .itemName,
-                                                    style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                ],
-                                              ),
-                                              GetBuilder<MainDaoController>(
-                                                builder: (_) => Container(
-                                                  margin: const EdgeInsets.only(
-                                                      top: 5),
-                                                  child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Container(
-                                                        margin: const EdgeInsets
-                                                            .only(right: 25),
-                                                        child: Text(
-                                                          "${checkIfOfferListEmpty(_mainDaoController.choosenShoppingList.value.offerModelList[index].offers)[0].price * _mainDaoController.choosenShoppingList.value.offerModelList[index].offerListenerEntity.itemCount},- Ft",
-                                                          style: const TextStyle(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
+                                                                .itemCount
+                                                                .toString(),
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            style:
+                                                                const TextStyle(
+                                                                    color: Colors
+                                                                        .white),
+                                                          ),
                                                         ),
                                                       ),
-                                                      Text(
-                                                        "${checkIfOfferListEmpty(_mainDaoController.choosenShoppingList.value.offerModelList[index].offers)[0].price} /db",
-                                                        style: const TextStyle(
-                                                            color:
-                                                                Color.fromARGB(
-                                                                    255,
-                                                                    185,
-                                                                    185,
-                                                                    185),
-                                                            fontSize: 12),
-                                                        textAlign:
-                                                            TextAlign.start,
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Expanded(
-                                                child: Container(
-                                                  height: 50,
-                                                  width: 250,
-                                                  child: ListTile(
-                                                    leading: CircleAvatar(
-                                                      radius: 20,
-                                                      backgroundImage: defineShopLogo(
-                                                          checkIfOfferListEmpty(
-                                                                  _mainDaoController
-                                                                      .choosenShoppingList
-                                                                      .value
-                                                                      .offerModelList[
-                                                                          index]
-                                                                      .offers)[0]
-                                                              .shopName),
                                                     ),
-                                                    title: Text(
-                                                      checkIfOfferListEmpty(
-                                                              _mainDaoController
-                                                                  .choosenShoppingList
-                                                                  .value
-                                                                  .offerModelList[
-                                                                      index]
-                                                                  .offers)[0]
-                                                          .shopName,
-                                                      style: const TextStyle(
-                                                          color: Colors.white,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                    subtitle: Text(
-                                                      checkIfOfferListEmpty(
-                                                              _mainDaoController
-                                                                  .choosenShoppingList
-                                                                  .value
-                                                                  .offerModelList[
-                                                                      index]
-                                                                  .offers)[0]
-                                                          .itemName,
-                                                      style: const TextStyle(
-                                                          color: Colors.white,
-                                                          fontWeight: FontWeight
-                                                              .normal),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(
-                                            height: 30,
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () async {
-                                                  await Navigator.push(
-                                                          context,
-                                                          CustomPageRoute(
-                                                              child: SearchOffersPage(
-                                                                  index: index,
-                                                                  itemCleanName: _mainDaoController
-                                                                      .choosenShoppingList
-                                                                      .value
-                                                                      .offerModelList[
-                                                                          index]
-                                                                      .offerListenerEntity
-                                                                      .itemName)))
-                                                      .then((value) =>
-                                                          _mainDaoController
-                                                              .update())
-                                                      .then((value) => setState(
-                                                            () {},
-                                                          ));
-                                                },
-                                                child: Container(
-                                                  margin:
-                                                      EdgeInsets.only(left: 20),
-                                                  width: 129,
-                                                  child: Text(
-                                                    '${_mainDaoController.choosenShoppingList.value.offerModelList[index].offers.length} találat ${checkIfOfferListEmpty(_mainDaoController.choosenShoppingList.value.offerModelList[index].offers)[0].price} Ft-tól',
-                                                    style: const TextStyle(
-                                                        color: Color.fromRGBO(
-                                                            30, 136, 228, 1),
-                                                        decoration:
-                                                            TextDecoration
-                                                                .underline),
-                                                  ),
-                                                ),
-                                              ),
-                                              Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  IconButton(
-                                                    onPressed: () {
-                                                      if (_mainDaoController
-                                                              .choosenShoppingList
-                                                              .value
-                                                              .offerModelList[
-                                                                  index]
-                                                              .offerListenerEntity
-                                                              .itemCount >
-                                                          1) {
+                                                    IconButton(
+                                                      onPressed: () {
                                                         log.d("onTap invoked!");
                                                         _mainDaoController
                                                             .modifyItemCountOnOfferListener(
@@ -634,87 +673,22 @@ class _ShoppingListGroupViewState extends State<ShoppingListGroupView> {
                                                                         index]
                                                                     .offerListenerEntity
                                                                     .id,
-                                                                -1,
+                                                                1,
                                                                 index)
                                                             .then((value) =>
                                                                 _mainDaoController
                                                                     .update());
-                                                      }
-                                                    },
-                                                    icon: const Icon(
-                                                      Icons.remove_circle,
-                                                      size: 30,
-                                                      color: Color.fromRGBO(
-                                                          130, 130, 130, 1),
-                                                    ),
-                                                  ),
-                                                  Container(
-                                                    height: 30,
-                                                    width: 35,
-                                                    decoration:
-                                                        const BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius.all(
-                                                                    Radius
-                                                                        .circular(
-                                                                            5)),
-                                                            color:
-                                                                Color.fromRGBO(
-                                                                    31,
-                                                                    36,
-                                                                    43,
-                                                                    1)),
-                                                    child: Center(
-                                                      child: GetBuilder<
-                                                          MainDaoController>(
-                                                        builder: (_) => Text(
-                                                          _mainDaoController
-                                                              .choosenShoppingList
-                                                              .value
-                                                              .offerModelList[
-                                                                  index]
-                                                              .offerListenerEntity
-                                                              .itemCount
-                                                              .toString(),
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                          style:
-                                                              const TextStyle(
-                                                                  color: Colors
-                                                                      .white),
-                                                        ),
+                                                      },
+                                                      icon: const Icon(
+                                                        Icons.add_circle,
+                                                        size: 22,
+                                                        color: Colors.black,
                                                       ),
-                                                    ),
-                                                  ),
-                                                  IconButton(
-                                                    onPressed: () {
-                                                      log.d("onTap invoked!");
-                                                      _mainDaoController
-                                                          .modifyItemCountOnOfferListener(
-                                                              _mainDaoController
-                                                                  .choosenShoppingList
-                                                                  .value
-                                                                  .offerModelList[
-                                                                      index]
-                                                                  .offerListenerEntity
-                                                                  .id,
-                                                              1,
-                                                              index)
-                                                          .then((value) =>
-                                                              _mainDaoController
-                                                                  .update());
-                                                    },
-                                                    icon: const Icon(
-                                                      Icons.add_circle,
-                                                      size: 30,
-                                                      color: Colors.white,
-                                                    ),
-                                                  )
-                                                ],
-                                              )
-                                            ],
-                                          ),
-                                        ]),
+                                                    )
+                                                  ],
+                                                )
+                                              ]),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -731,7 +705,10 @@ class _ShoppingListGroupViewState extends State<ShoppingListGroupView> {
                       child: Row(
                         children: [
                           Container(
-                            color: Colors.white,
+                            decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(10))),
                             width: MediaQuery.of(context).size.width / 2 - 15,
                             height: 80,
                             child: Padding(
@@ -763,9 +740,82 @@ class _ShoppingListGroupViewState extends State<ShoppingListGroupView> {
                               });
                               _textFadeInController.fadeIn();
                               textFocus.requestFocus();
+
+                              /* showBarModalBottomSheet(
+                                expand: true,
+                                context: context,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) => Container(
+                                  color: Colors.black,
+                                  height: double.infinity,
+                                  child: Container(
+                                    width: 600,
+                                    height: 38,
+                                    margin: const EdgeInsets.only(
+                                        left: 10, right: 10, top: 20),
+                                    child: TextField(
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                        //autofocus: true,
+                                        controller: offerSearchTextController,
+                                        focusNode: textFocus,
+                                        onEditingComplete: () {
+                                          print('editing completed!');
+                                        },
+                                        onSubmitted: (value) async {
+                                          print(offerSearchTextController.text);
+
+                                          /*setState(() {
+                                            messageVisible = true;
+                                            listVisible = false;
+                                          });
+
+                                          await createNewOfferListener();
+
+                                          setState(() {
+                                            messageVisible = false;
+                                            listVisible = true;
+                                            offerSearchTextController.text = "";
+                                            _textFadeInController.fadeOut();
+                                            textInputVisible = false;
+                                            _textFadeInController =
+                                                FadeInController();
+                                          });
+
+                                          FocusScopeNode currentFocus =
+                                              FocusScope.of(context);
+                                          if (!currentFocus.hasPrimaryFocus) {
+                                            currentFocus.unfocus();
+                                          }
+
+                                          //Navigator.of(context).pop();
+                                          */
+                                        },
+                                        textAlign: TextAlign.start,
+                                        textAlignVertical:
+                                            TextAlignVertical.bottom,
+                                        autocorrect: false,
+                                        decoration: InputDecoration(
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16.0),
+                                            ),
+                                            filled: true,
+                                            hintStyle:
+                                                TextStyle(color: Colors.grey),
+                                            hintText:
+                                                "+ Új elem a bevásárló listára!",
+                                            fillColor: const Color.fromRGBO(
+                                                23, 23, 23, 1))),
+                                  ),
+                                ),
+                              );*/
                             },
                             child: Container(
-                              color: Color.fromRGBO(104, 237, 173, 1),
+                              decoration: const BoxDecoration(
+                                  color: Color.fromRGBO(104, 237, 173, 1),
+                                  borderRadius: BorderRadius.only(
+                                      bottomRight: Radius.circular(10))),
                               width: MediaQuery.of(context).size.width / 2 - 15,
                               height: 80,
                               child: Padding(
