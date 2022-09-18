@@ -33,6 +33,9 @@ class _AuthGateState extends State<AuthGate> {
                           '1028524662787-4rv061tnikes9eovpvjf0m0no2qmpecv.apps.googleusercontent.com'),
                   FacebookProviderConfiguration(clientId: '3249979211885631')
                 ],
+                subtitleBuilder: (context, _) {
+                  return Container(color: const Color.fromRGBO(37, 37, 37, 1));
+                },
                 headerBuilder: (context, constraints, _) {
                   return Container(
                     margin: EdgeInsets.only(top: 30),

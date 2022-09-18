@@ -163,16 +163,20 @@ class MainDaoController extends GetxController {
     /*choosenShoppingList.value.offerModelList.map(
         (e) => e.offers.removeWhere((element) => element.isSelectedFlag == 0));*/
 
-    for (OfferModelList offerModelList
+    /*for (OfferModelList offerModelList
         in choosenShoppingList.value.offerModelList) {
       offerModelList.offers
           .removeWhere((element) => element.isSelectedFlag == 0);
-    }
+    }*/
 
     for (var i = 0; i < mappedList.length; i++) {
-      log.d(
-          "offer len remove:${choosenShoppingList.value.offerModelList[i].offers.length} adding:${mappedList[i].length.toString()} element..");
-      choosenShoppingList.value.offerModelList[i].offers.addAll(mappedList[i]);
+      List<Offer> offers = mappedList[i];
+
+      offers.removeWhere((filteredKeywordMap) => choosenShoppingList
+          .value.offerModelList[i].offers
+          .any((element) => filteredKeywordMap.id == element.id));
+
+      choosenShoppingList.value.offerModelList[i].offers.addAll(offers);
     }
 
     choosenShoppingList.value.offerModelList.sort((b, a) =>

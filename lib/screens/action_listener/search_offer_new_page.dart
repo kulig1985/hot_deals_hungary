@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:hot_deals_hungary/controllers/main_dao_controller.dart';
 import 'package:hot_deals_hungary/controllers/mongo_dao_controller.dart';
@@ -11,6 +12,7 @@ import 'package:hot_deals_hungary/models/mongo/offer.dart';
 import 'package:hot_deals_hungary/models/mongo/offer_creation_done.dart';
 import 'package:hot_deals_hungary/models/mongo/shopping_list_complex_model.dart';
 import 'package:hot_deals_hungary/screens/components/custom_app_bar.dart';
+import 'package:hot_deals_hungary/screens/shopping_list/item_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
@@ -135,17 +137,17 @@ class _SearchOffersPageState extends State<SearchOffersPage> {
               Hero(
                 tag: 'searchHero',
                 child: Container(
-                  margin: EdgeInsets.only(top: 15),
+                  margin: EdgeInsets.only(top: 10),
                   child: Container(
                     margin: EdgeInsets.only(left: 20, right: 10),
-                    height: 38,
+                    height: 20,
                     child: Visibility(
                       visible: listVisible,
                       child: Text(
                         "${_mainDaoController.choosenShoppingList.value.offerModelList[widget.index!].offers.length.toString()}db akciós ${widget.itemCleanName} találat",
                         style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 22,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -191,7 +193,7 @@ class _SearchOffersPageState extends State<SearchOffersPage> {
               ),
               GetBuilder<MongoDaoController>(
                 builder: (_) => Container(
-                  margin: const EdgeInsets.only(top: 0, left: 20, bottom: 35),
+                  margin: const EdgeInsets.only(top: 0, left: 20, bottom: 10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: const [
@@ -247,18 +249,22 @@ class _SearchOffersPageState extends State<SearchOffersPage> {
               Visibility(
                   visible: !listVisible,
                   child: Container(
+                    margin: EdgeInsets.only(top: 150),
                     child: Center(
                         child: Column(
                       children: const [
                         CircularProgressIndicator(
                           color: Colors.white,
                         ),
-                        Text(
-                          "Egy pillanat...",
-                          style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold),
+                        Padding(
+                          padding: EdgeInsets.only(top: 15),
+                          child: Text(
+                            "Egy pillanat...",
+                            style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
                         )
                       ],
                     )),
@@ -281,131 +287,169 @@ class _SearchOffersPageState extends State<SearchOffersPage> {
                             child: SlideAnimation(
                               verticalOffset: 20.0,
                               child: FadeInAnimation(
-                                child: Container(
-                                  height: 120,
-                                  margin: const EdgeInsets.only(
-                                      bottom: 2, left: 5, right: 5),
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(5.0)),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.only(left: 5),
-                                        child: FutureBuilder(
-                                          future: checkImageUrl(
-                                              'http://95.138.193.102:9988/image_download/${offer.imageUrl}'),
-                                          builder: ((context, snapshot) {
-                                            if (snapshot.data != null) {
-                                              return FadeInImage(
-                                                width: 100,
-                                                height: 100,
-                                                placeholder: const AssetImage(
-                                                    'assets/images/wait.png'),
-                                                image: NetworkImage(
-                                                    'http://95.138.193.102:9988/image_download/${offer.imageUrl}'),
-                                              );
-                                            } else {
-                                              return const Image(
-                                                image: AssetImage(
-                                                    'assets/images/image_not_found.png'),
-                                                width: 75,
-                                                height: 75,
-                                              );
-                                            }
-                                          }),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                ItemPageScreen(
+                                                  offer: offer,
+                                                  index: index,
+                                                )));
+                                  },
+                                  child: Container(
+                                    height: 120,
+                                    margin: const EdgeInsets.only(
+                                        bottom: 2, left: 5, right: 5),
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        border: Border.all(
+                                            width: 1,
+                                            color: offer.isSelectedFlag == 0
+                                                ? Colors.transparent
+                                                : const Color.fromRGBO(
+                                                    104, 237, 173, 1)),
+                                        borderRadius:
+                                            BorderRadius.circular(5.0)),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                          margin: EdgeInsets.only(left: 5),
+                                          child: FutureBuilder(
+                                            future: checkImageUrl(
+                                                'http://95.138.193.102:9988/image_download/${offer.imageUrl}'),
+                                            builder: ((context, snapshot) {
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.done) {
+                                                if (snapshot.data != null) {
+                                                  return FadeInImage(
+                                                    width: 100,
+                                                    height: 100,
+                                                    placeholder: const AssetImage(
+                                                        'assets/images/wait.png'),
+                                                    image: NetworkImage(
+                                                        'http://95.138.193.102:9988/image_download/${offer.imageUrl}'),
+                                                  );
+                                                } else {
+                                                  return const Image(
+                                                    image: AssetImage(
+                                                        'assets/images/image_not_found.png'),
+                                                    width: 100,
+                                                    height: 100,
+                                                  );
+                                                }
+                                              } else {
+                                                return const Image(
+                                                  image: AssetImage(
+                                                      'assets/images/image_not_found.png'),
+                                                  width: 100,
+                                                  height: 100,
+                                                );
+                                              }
+                                            }),
+                                          ),
                                         ),
-                                      ),
-                                      Expanded(
-                                        child: Container(
-                                          margin: EdgeInsets.only(left: 20),
-                                          width: 200,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                '${offer.price},-Ft',
-                                                style: const TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              SizedBox(
-                                                width: 200,
-                                                child: AutoSizeText(
-                                                  offer.itemName,
-                                                  maxLines: 3,
+                                        Expanded(
+                                          child: Container(
+                                            margin: EdgeInsets.only(left: 20),
+                                            width: 200,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  '${offer.price},-Ft',
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
                                                 ),
-                                              ),
-                                              Text(offer.shopName),
-                                            ],
+                                                SizedBox(
+                                                  width: 200,
+                                                  child: AutoSizeText(
+                                                    offer.itemName,
+                                                    maxLines: 3,
+                                                  ),
+                                                ),
+                                                Text(offer.shopName),
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.only(right: 10),
-                                        child: Material(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          color: Colors.white,
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              IconButton(
-                                                  splashRadius: 60,
-                                                  icon: const Icon(Icons
-                                                      .change_circle_outlined),
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      listVisible = false;
-                                                    });
+                                        Container(
+                                          margin: EdgeInsets.only(right: 10),
+                                          child: Material(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            color: Colors.white,
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                IconButton(
+                                                    splashRadius: 60,
+                                                    icon: const FaIcon(
+                                                      FontAwesomeIcons
+                                                          .cartShopping,
+                                                      color: Colors.grey,
+                                                    ),
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        listVisible = false;
+                                                      });
 
-                                                    _mainDaoController
-                                                        .addItemToShoppingList(
-                                                            _mainDaoController
-                                                                .choosenShoppingList
-                                                                .value
-                                                                .offerModelList[
-                                                                    widget
-                                                                        .index!]
-                                                                .offerListenerEntity
-                                                                .id,
-                                                            offer)
-                                                        .then((value) => _mainDaoController
-                                                            .getAllComplexShoppingListByUser(
-                                                                _userDataController
-                                                                    .user,
-                                                                _mainDaoController
-                                                                    .choosenShoppingList
-                                                                    .value
-                                                                    .id
-                                                                    .oid,
-                                                                true,
-                                                                false,
-                                                                true))
-                                                        .then((value) => _mainDaoController
-                                                            .selectShoppingList(
-                                                                _mainDaoController
-                                                                    .oldShoppingListoid!))
-                                                        .then((value) =>
-                                                            Navigator.pop(
-                                                                context));
-                                                  }),
-                                              const Text(
-                                                "Csere",
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.w200),
-                                              )
-                                            ],
+                                                      _mainDaoController
+                                                          .addItemToShoppingList(
+                                                              _mainDaoController
+                                                                  .choosenShoppingList
+                                                                  .value
+                                                                  .offerModelList[
+                                                                      widget
+                                                                          .index!]
+                                                                  .offerListenerEntity
+                                                                  .id,
+                                                              offer)
+                                                          .then((value) => _mainDaoController
+                                                              .getAllComplexShoppingListByUser(
+                                                                  _userDataController
+                                                                      .user,
+                                                                  _mainDaoController
+                                                                      .choosenShoppingList
+                                                                      .value
+                                                                      .id
+                                                                      .oid,
+                                                                  true,
+                                                                  false,
+                                                                  true))
+                                                          .then((value) =>
+                                                              _mainDaoController
+                                                                  .selectShoppingList(
+                                                                      _mainDaoController
+                                                                          .oldShoppingListoid!))
+                                                          .then((value) =>
+                                                              Navigator.pop(
+                                                                  context));
+                                                    }),
+                                                Container(
+                                                  width: 60,
+                                                  child: const Text(
+                                                    "Kiválaszt!",
+                                                    textAlign: TextAlign.center,
+                                                    maxLines: 2,
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w200),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                      )
-                                    ],
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),

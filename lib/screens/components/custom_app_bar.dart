@@ -50,21 +50,25 @@ class _CustomAppBarState extends State<CustomAppBar> {
   Widget build(BuildContext context) {
     return GetBuilder<MongoDaoController>(
       builder: (_) => AppBar(
+        centerTitle: false,
+        titleSpacing: 20.0,
         title: Text(widget.titleName),
+
         elevation: 3,
         backgroundColor: const Color.fromRGBO(37, 37, 37, 1),
-        actions: [IconButton(
-          iconSize: 20,
-          icon: const FaIcon(FontAwesomeIcons.user),
-          color: Colors.white,
-          onPressed: () {
-
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const UserProfileScreen()));
-          },
-        )],
+        actions: [
+          IconButton(
+            iconSize: 20,
+            icon: const FaIcon(FontAwesomeIcons.user),
+            color: Colors.white,
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const UserProfileScreen()));
+            },
+          )
+        ],
         /*actions: [
           Container(
             margin: EdgeInsets.only(right: 20),

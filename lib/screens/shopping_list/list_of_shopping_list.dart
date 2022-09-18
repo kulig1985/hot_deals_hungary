@@ -20,9 +20,11 @@ import 'package:hot_deals_hungary/models/mongo/shopping_list_complex_model.dart'
 import 'package:hot_deals_hungary/models/mongo/shopping_list_entity.dart';
 import 'package:hot_deals_hungary/screens/components/custom_app_bar.dart';
 import 'package:hot_deals_hungary/screens/shopping_list/shopping_list_group_view.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:logger/logger.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:uni_links/uni_links.dart';
+import 'package:flutter_fgbg/flutter_fgbg.dart';
 
 class ListOfShoppingListScreen extends StatefulWidget {
   const ListOfShoppingListScreen({Key? key}) : super(key: key);
@@ -32,7 +34,8 @@ class ListOfShoppingListScreen extends StatefulWidget {
       _ListOfShoppingListScreenState();
 }
 
-class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen> {
+class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen>
+    with WidgetsBindingObserver {
   var log = Logger(
     printer: PrettyPrinter(
         methodCount: 1, // number of method calls to be displayed
@@ -72,11 +75,23 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen> {
     _incomingLinkHandler();
     shoppingListOnUser = _mainDaoController.getAllComplexShoppingListByUser(
         _userDataController.user, null, false, false, true);
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    log.d("didChangeAppLifecycleState invoked state: $state");
+    if (state == AppLifecycleState.resumed) {
+      shoppingListOnUser = _mainDaoController.getAllComplexShoppingListByUser(
+          _userDataController.user, null, false, false, true);
+
+      setState(() {});
+    }
   }
 
   @override
   void dispose() {
     _streamSubscription?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -158,7 +173,7 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen> {
       log.d('Error occurred: $err');
       setState(() {
         _currentURI = null;
-        //appLinkCheckFinished = true;
+        appLinkCheckFinished = true;
         if (err is FormatException) {
           _err = err;
         } else {
@@ -370,6 +385,11 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen> {
         ));
   }
 
+  Future<void> refreshGrid() async {
+    shoppingListOnUser = _mainDaoController.getAllComplexShoppingListByUser(
+        _userDataController.user, null, false, false, true);
+  }
+
   Widget conoditionalShoppingListGridCreator() {
     if (appLinkCheckFinished) {
       return Expanded(
@@ -391,191 +411,207 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen> {
                   child: Container(
                     margin: const EdgeInsets.only(left: 15, right: 15, top: 15),
                     child: GetBuilder<MongoDaoController>(
-                      builder: (_) => GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                mainAxisExtent: 180.0,
-                                crossAxisSpacing: 0,
-                                mainAxisSpacing: 0),
-                        itemCount: data.length,
-                        itemBuilder: (context, index) {
-                          return AnimationConfiguration.staggeredGrid(
-                            position: index,
-                            duration: const Duration(milliseconds: 375),
-                            columnCount: 2,
-                            child: ScaleAnimation(
-                              child: FadeInAnimation(
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  color: colors[
-                                      ((index / 5 - (index / 5).floor()) * 5)
-                                          .toInt()],
-                                  child: Container(
-                                      child: GestureDetector(
-                                    onTap: () async {
-                                      setState(() {
-                                        isLoading = true;
-                                      });
-                                      await _mainDaoController
-                                          .selectShoppingList(
-                                              data[index].id.oid);
+                      builder: (_) => LiquidPullToRefresh(
+                        height: 100,
+                        color: const Color.fromRGBO(37, 37, 37, 1),
+                        showChildOpacityTransition: false,
+                        springAnimationDurationInMilliseconds: 500,
+                        onRefresh: () async {
+                          refreshGrid();
+                          setState(() {});
+                        },
+                        child: GridView.builder(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  mainAxisExtent: 180.0,
+                                  crossAxisSpacing: 0,
+                                  mainAxisSpacing: 0),
+                          itemCount: data.length,
+                          itemBuilder: (context, index) {
+                            return AnimationConfiguration.staggeredGrid(
+                              position: index,
+                              duration: const Duration(milliseconds: 375),
+                              columnCount: 2,
+                              child: ScaleAnimation(
+                                child: FadeInAnimation(
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15.0),
+                                    ),
+                                    color: colors[
+                                        ((index / 5 - (index / 5).floor()) * 5)
+                                            .toInt()],
+                                    child: Container(
+                                        child: GestureDetector(
+                                      onTap: () async {
+                                        setState(() {
+                                          isLoading = true;
+                                        });
+                                        await _mainDaoController
+                                            .selectShoppingList(
+                                                data[index].id.oid);
 
-                                      _navigator
-                                          .push(MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const ShoppingListGroupView()))
-                                          .then((value) => setState(
-                                                () {
-                                                  isLoading = false;
-                                                },
-                                              ));
-                                    },
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              top: 10, left: 10, right: 10),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Expanded(
-                                                child: Container(
-                                                  child: Text(
-                                                    data[index].listName,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: const TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 20.0,
-                                                        fontWeight:
-                                                            FontWeight.bold),
+                                        _navigator
+                                            .push(MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const ShoppingListGroupView()))
+                                            .then((value) => setState(
+                                                  () {
+                                                    isLoading = false;
+                                                  },
+                                                ));
+                                      },
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 10, left: 10, right: 10),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Expanded(
+                                                  child: Container(
+                                                    width: 60,
+                                                    child: Text(
+                                                      data[index].listName,
+                                                      maxLines: 2,
+                                                      style: const TextStyle(
+                                                          color: Colors.black,
+                                                          fontSize: 16.0,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
                                                   ),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 10, top: 10),
-                                            child: Text(
-                                              "${data[index].offerModelList.length} db termék",
-                                              style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.bold),
+                                                )
+                                              ],
                                             ),
                                           ),
-                                        ),
-
-                                        /*Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 10, top: 10),
-                                            child: Text(
-                                              "${_mainDaoController.countSumOfShoppingList(data[index])} ,-Ft",
-                                              style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                        ),*/
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            /*const Padding(
-                                              padding: EdgeInsets.only(
-                                                  top: 0, left: 10, bottom: 0),
-                                              child: FaIcon(
-                                                FontAwesomeIcons.listCheck,
-                                                color: Colors.white,
-                                              ),
-                                            ),*/
-                                            Padding(
+                                          Expanded(
+                                            child: Padding(
                                               padding: const EdgeInsets.only(
-                                                  top: 0, right: 10, bottom: 0),
-                                              child: PopupMenuButton(
-                                                  color: const Color.fromRGBO(
-                                                      43, 47, 58, 1),
-                                                  icon: const FaIcon(
-                                                    FontAwesomeIcons.ellipsis,
+                                                  left: 10, top: 10),
+                                              child: Text(
+                                                "${data[index].offerModelList.length} db termék",
+                                                style: const TextStyle(
                                                     color: Colors.black,
-                                                  ),
-                                                  itemBuilder: (context) {
-                                                    return List.generate(
-                                                      listOptions.length,
-                                                      (index) => PopupMenuItem(
-                                                        value:
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                          ),
+
+                                          /*Expanded(
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 10, top: 10),
+                                              child: Text(
+                                                "${_mainDaoController.countSumOfShoppingList(data[index])} ,-Ft",
+                                                style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold),
+                                              ),
+                                            ),
+                                          ),*/
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              /*const Padding(
+                                                padding: EdgeInsets.only(
+                                                    top: 0, left: 10, bottom: 0),
+                                                child: FaIcon(
+                                                  FontAwesomeIcons.listCheck,
+                                                  color: Colors.white,
+                                                ),
+                                              ),*/
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 0,
+                                                    right: 10,
+                                                    bottom: 0),
+                                                child: PopupMenuButton(
+                                                    color: const Color.fromRGBO(
+                                                        43, 47, 58, 1),
+                                                    icon: const FaIcon(
+                                                      FontAwesomeIcons.ellipsis,
+                                                      color: Colors.black,
+                                                    ),
+                                                    itemBuilder: (context) {
+                                                      return List.generate(
+                                                        listOptions.length,
+                                                        (index) =>
+                                                            PopupMenuItem(
+                                                          value: listOptions[
+                                                              index],
+                                                          child: Text(
                                                             listOptions[index],
-                                                        child: Text(
-                                                          listOptions[index],
-                                                          style:
-                                                              const TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 15,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .normal,
-                                                            fontFamily:
-                                                                'Roboto',
+                                                            style:
+                                                                const TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 15,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .normal,
+                                                              fontFamily:
+                                                                  'Roboto',
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                    );
-                                                  },
-                                                  onSelected: (value) async {
-                                                    print(value);
+                                                      );
+                                                    },
+                                                    onSelected: (value) async {
+                                                      print(value);
 
-                                                    if (value == 'Törlés') {
-                                                      await _mainDaoController
-                                                          .removeUserFromShoppingList(
-                                                              _userDataController
-                                                                  .user,
-                                                              data[index]
-                                                                  .id
-                                                                  .oid);
+                                                      if (value == 'Törlés') {
+                                                        await _mainDaoController
+                                                            .removeUserFromShoppingList(
+                                                                _userDataController
+                                                                    .user,
+                                                                data[index]
+                                                                    .id
+                                                                    .oid);
 
-                                                      shoppingListOnUser =
-                                                          _mainDaoController
-                                                              .getAllComplexShoppingListByUser(
-                                                                  _userDataController
-                                                                      .user,
-                                                                  null,
-                                                                  false,
-                                                                  false,
-                                                                  true);
+                                                        shoppingListOnUser =
+                                                            _mainDaoController
+                                                                .getAllComplexShoppingListByUser(
+                                                                    _userDataController
+                                                                        .user,
+                                                                    null,
+                                                                    false,
+                                                                    false,
+                                                                    true);
 
-                                                      setState(() {});
-                                                    }
-                                                    if (value == 'Megosztás') {
-                                                      share(
-                                                          'hotdeal://kebodev.hu/?shoppingList=${data[index].id.oid}');
-                                                    }
-                                                  }),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  right: 10),
-                                              child:
-                                                  checkSharedList(data[index]),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  )),
+                                                        setState(() {});
+                                                      }
+                                                      if (value ==
+                                                          'Megosztás') {
+                                                        share(
+                                                            'hotdeal://kebodev.hu/?shoppingList=${data[index].id.oid}');
+                                                      }
+                                                    }),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 10),
+                                                child: checkSharedList(
+                                                    data[index]),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    )),
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),
