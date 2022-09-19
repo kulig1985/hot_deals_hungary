@@ -112,93 +112,96 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             backButtonchooser: false,
           ),
         ),
-        body: SafeArea(
-            child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
+        body: Container(
           color: const Color.fromRGBO(37, 37, 37, 1),
-          child: Stack(children: [
-            Column(
-              children: [
-                /*HeaderWidget(
-              titleName: 'Profil',
-              backButtonchooser: false,
-            ),*/
-                const Divider(
-                  color: Colors.black12,
-                ),
-                Center(
-                  child: Text(
-                    "Süssön rád a 🌞 kedves ${checkUserNameExist(_userDataController.user)} a következő azonosítóval tudod megosztani a listáidat. Csak rá kell klikkelj és már is kimaásoltad!",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 20, color: Colors.white),
+          child: SafeArea(
+              child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
+            color: const Color.fromRGBO(37, 37, 37, 1),
+            child: Stack(children: [
+              Column(
+                children: [
+                  /*HeaderWidget(
+                titleName: 'Profil',
+                backButtonchooser: false,
+              ),*/
+                  const Divider(
+                    color: Colors.black12,
                   ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(left: 10, right: 10),
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.only(top: 40, left: 20, bottom: 40),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Container(
-                            width: 300,
-                            child: SelectableText(
-                              "${_userDataController.user.uid}",
-                              style: const TextStyle(
-                                  fontSize: 15, color: Colors.white),
-                              onTap: () {
-                                Clipboard.setData(ClipboardData(
-                                    text: _userDataController.user.uid));
-                                Get.snackbar("Másolás!", "User ID lemásolva!",
-                                    snackPosition: SnackPosition.TOP,
-                                    isDismissible: true,
-                                    duration: const Duration(seconds: 1));
-                              },
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 40),
-                          child: Material(
-                            borderRadius: BorderRadius.circular(40),
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () {
-                                Clipboard.setData(ClipboardData(
-                                    text: _userDataController.user.uid));
-                                Get.snackbar("Másolás!", "User ID lemásolva!",
-                                    snackPosition: SnackPosition.TOP,
-                                    isDismissible: true,
-                                    duration: const Duration(seconds: 1));
-                              },
-                              child: const Icon(
-                                Icons.copy,
-                                size: 17,
-                                color: Colors.white,
+                  Center(
+                    child: Text(
+                      "Süssön rád a 🌞 kedves ${checkUserNameExist(_userDataController.user)} a következő azonosítóval tudod megosztani a listáidat. Csak rá kell klikkelj és már is kimaásoltad!",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(left: 10, right: 10),
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.only(top: 40, left: 20, bottom: 40),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Container(
+                              width: 300,
+                              child: SelectableText(
+                                "${_userDataController.user.uid}",
+                                style: const TextStyle(
+                                    fontSize: 15, color: Colors.white),
+                                onTap: () {
+                                  Clipboard.setData(ClipboardData(
+                                      text: _userDataController.user.uid));
+                                  Get.snackbar("Másolás!", "User ID lemásolva!",
+                                      snackPosition: SnackPosition.TOP,
+                                      isDismissible: true,
+                                      duration: const Duration(seconds: 1));
+                                },
                               ),
                             ),
                           ),
-                        )
-                      ],
+                          Padding(
+                            padding: const EdgeInsets.only(right: 40),
+                            child: Material(
+                              borderRadius: BorderRadius.circular(40),
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {
+                                  Clipboard.setData(ClipboardData(
+                                      text: _userDataController.user.uid));
+                                  Get.snackbar("Másolás!", "User ID lemásolva!",
+                                      snackPosition: SnackPosition.TOP,
+                                      isDismissible: true,
+                                      duration: const Duration(seconds: 1));
+                                },
+                                child: const Icon(
+                                  Icons.copy,
+                                  size: 17,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    await _signOut();
-                  },
-                  icon: const Icon(Icons.logout),
-                  label: const Text("Kilépés"),
-                  style: ElevatedButton.styleFrom(
-                      textStyle: const TextStyle(fontSize: 15),
-                      primary: const Color.fromRGBO(196, 99, 82, 1)),
-                )
-              ],
-            )
-          ]),
-        )));
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      await _signOut();
+                    },
+                    icon: const Icon(Icons.logout),
+                    label: const Text("Kilépés"),
+                    style: ElevatedButton.styleFrom(
+                        textStyle: const TextStyle(fontSize: 15),
+                        primary: const Color.fromRGBO(196, 99, 82, 1)),
+                  )
+                ],
+              )
+            ]),
+          )),
+        ));
   }
 }

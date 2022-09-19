@@ -185,10 +185,12 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen>
 
   Future<void> loadSharedList(Uri uri) async {
     log.d("loadSharedList with uri: $uri");
-    String shoppingListId = _currentURI!.queryParameters['shoppingList']!;
-    _currentURI = null;
+    if (_currentURI != null) {
 
-    /*final stream = Stream.fromFutures([
+      String shoppingListId = _currentURI!.queryParameters['shoppingList']!;
+      _currentURI = null;
+
+      /*final stream = Stream.fromFutures([
       _mainDaoController.addUserToShoppingList(
           _userDataController.user, shoppingListId),
       _mainDaoController.getAllComplexShoppingListByUser(
@@ -199,26 +201,38 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen>
     stream.asyncMap((event) => null).drain(null);
 */
 
-    await _mainDaoController.addUserToShoppingList(
-        _userDataController.user, shoppingListId);
+      await _mainDaoController.addUserToShoppingList(
+          _userDataController.user, shoppingListId);
 
-    await _mainDaoController.getAllComplexShoppingListByUser(
-        _userDataController.user, shoppingListId, true, false, true);
+      await _mainDaoController.getAllComplexShoppingListByUser(
+          _userDataController.user, shoppingListId, true, false, true);
 
-    await _mainDaoController.selectShoppingList(shoppingListId);
+      await _mainDaoController.selectShoppingList(shoppingListId);
 
-    Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const ShoppingListGroupView()))
-        .then((value) => shoppingListOnUser =
-            _mainDaoController.getAllComplexShoppingListByUser(
-                _userDataController.user, null, true, false, true))
-        .then((value) => setState(
-              () {
-                appLinkCheckFinished = true;
-              },
-            ));
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const ShoppingListGroupView()))
+          .then((value) => shoppingListOnUser =
+          _mainDaoController.getAllComplexShoppingListByUser(
+              _userDataController.user, null, true, false, true))
+          .then((value) => setState(
+            () {
+          appLinkCheckFinished = true;
+        },
+      ));
+
+    }
+    else {
+
+      setState(
+            () {
+          appLinkCheckFinished = true;
+        },
+      );
+
+    }
+
   }
 
   Widget checkSharedList(ShoppingListComplexModel shoppingListComplexModel) {
