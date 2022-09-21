@@ -380,71 +380,75 @@ class _SearchOffersPageState extends State<SearchOffersPage> {
                                             ),
                                           ),
                                         ),
-                                        Container(
-                                          margin: EdgeInsets.only(right: 10),
-                                          child: Material(
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                            color: Colors.white,
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                IconButton(
-                                                    splashRadius: 60,
-                                                    icon: const FaIcon(
-                                                      FontAwesomeIcons
-                                                          .cartShopping,
-                                                      color: Colors.grey,
-                                                    ),
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        listVisible = false;
-                                                      });
+                                        Visibility(
+                                          visible: offer.isSelectedFlag == 0,
+                                          child: Container(
+                                            margin: EdgeInsets.only(right: 10),
+                                            child: Material(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              color: Colors.white,
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  IconButton(
+                                                      splashRadius: 60,
+                                                      icon: const FaIcon(
+                                                        FontAwesomeIcons
+                                                            .cartShopping,
+                                                        color: Colors.grey,
+                                                      ),
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          listVisible = false;
+                                                        });
 
-                                                      _mainDaoController
-                                                          .addItemToShoppingList(
-                                                              _mainDaoController
-                                                                  .choosenShoppingList
-                                                                  .value
-                                                                  .offerModelList[
-                                                                      widget
-                                                                          .index!]
-                                                                  .offerListenerEntity
-                                                                  .id,
-                                                              offer)
-                                                          .then((value) => _mainDaoController
-                                                              .getAllComplexShoppingListByUser(
-                                                                  _userDataController
-                                                                      .user,
-                                                                  _mainDaoController
-                                                                      .choosenShoppingList
-                                                                      .value
-                                                                      .id
-                                                                      .oid,
-                                                                  true,
-                                                                  false,
-                                                                  true))
-                                                          .then((value) =>
-                                                              _mainDaoController
-                                                                  .selectShoppingList(
-                                                                      _mainDaoController
-                                                                          .oldShoppingListoid!))
-                                                          .then((value) =>
-                                                              Navigator.pop(
-                                                                  context));
-                                                    }),
-                                                Container(
-                                                  width: 60,
-                                                  child: const Text(
-                                                    "Kiválaszt!",
-                                                    textAlign: TextAlign.center,
-                                                    maxLines: 2,
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w200),
-                                                  ),
-                                                )
-                                              ],
+                                                        _mainDaoController
+                                                            .addItemToShoppingList(
+                                                                _mainDaoController
+                                                                    .choosenShoppingList
+                                                                    .value
+                                                                    .offerModelList[
+                                                                        widget
+                                                                            .index!]
+                                                                    .offerListenerEntity
+                                                                    .id,
+                                                                offer)
+                                                            .then((value) => _mainDaoController
+                                                                .getAllComplexShoppingListByUser(
+                                                                    _userDataController
+                                                                        .user,
+                                                                    _mainDaoController
+                                                                        .choosenShoppingList
+                                                                        .value
+                                                                        .id
+                                                                        .oid,
+                                                                    true,
+                                                                    false,
+                                                                    true))
+                                                            .then((value) =>
+                                                                _mainDaoController
+                                                                    .selectShoppingList(
+                                                                        _mainDaoController
+                                                                            .oldShoppingListoid!))
+                                                            .then((value) =>
+                                                                Navigator.pop(
+                                                                    context));
+                                                      }),
+                                                  Container(
+                                                    width: 60,
+                                                    child: const Text(
+                                                      "Kiválaszt!",
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      maxLines: 2,
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w200),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         )

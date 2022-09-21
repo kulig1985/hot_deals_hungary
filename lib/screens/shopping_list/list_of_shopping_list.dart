@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -59,7 +60,7 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen>
   Uri? _currentURI;
   Object? _err;
   bool _initialURILinkHandled = false;
-  bool appLinkCheckFinished = false;
+  bool appLinkCheckFinished = true;
   bool isLoading = false;
 
   Widget _getListWidgets(List<AlloweUidList> lstItens) {
@@ -71,11 +72,128 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen>
     log.d("initState called!");
 
     super.initState();
-    _initURIHandler();
-    _incomingLinkHandler();
+    //_initURIHandler();
+    //_incomingLinkHandler();
+    _initFirebaseDynamicLink();
     shoppingListOnUser = _mainDaoController.getAllComplexShoppingListByUser(
         _userDataController.user, null, false, false, true);
     WidgetsBinding.instance.addObserver(this);
+
+    FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) async {
+      log.d(
+          "dynamicLink: ${dynamicLinkData.link.queryParameters['shoppingListId']!}");
+
+      setState(
+        () {
+          appLinkCheckFinished = false;
+        },
+      );
+
+      String? shoppingListId =
+          dynamicLinkData.link.queryParameters['shoppingListId'];
+      String? shoppingListName =
+          dynamicLinkData.link.queryParameters['shoppingListName'];
+
+      if (shoppingListId != null && shoppingListName != null) {
+        await showAddSharedListDialog(
+            context, shoppingListId, shoppingListName);
+      } else {
+        setState(
+          () {
+            appLinkCheckFinished = true;
+          },
+        );
+      }
+    }).onError((error) {
+      // Handle errors
+      setState(
+        () {
+          appLinkCheckFinished = true;
+        },
+      );
+    });
+  }
+
+  showAddSharedListDialog(
+      BuildContext context, String shoppingListId, String listName) async {
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: const Text(
+        "Nem",
+        style: TextStyle(color: Colors.black),
+      ),
+      onPressed: () {
+        setState(
+          () {
+            appLinkCheckFinished = true;
+            Navigator.of(context).pop();
+          },
+        );
+      },
+    );
+    Widget continueButton = TextButton(
+      child: const Text(
+        "Igen",
+        style: TextStyle(color: Colors.black),
+      ),
+      onPressed: () async {
+        Navigator.of(context).pop();
+        await loadSharedList(shoppingListId);
+      },
+    ); // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: const Text(
+        "Feliratkozás listára?",
+        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+      ),
+      content: Text(
+        "Szeretnél feliratkozni a ${listName} nevű listára?",
+        style: const TextStyle(color: Colors.black),
+      ),
+      backgroundColor: const Color.fromRGBO(104, 237, 173, 1),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    ); // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  Future<void> _initFirebaseDynamicLink() async {
+    final PendingDynamicLinkData? initialLink =
+        await FirebaseDynamicLinks.instance.getInitialLink();
+
+    if (initialLink != null) {
+      log.d(
+          "initialLink: ${initialLink.link.queryParameters['shoppingListId']!}");
+
+      String? shoppingListId =
+          initialLink.link.queryParameters['shoppingListId'];
+      String? shoppingListName =
+          initialLink.link.queryParameters['shoppingListName'];
+
+      setState(
+        () {
+          appLinkCheckFinished = false;
+        },
+      );
+
+      if (shoppingListId != null && shoppingListName != null) {
+        await showAddSharedListDialog(
+            context, shoppingListId, shoppingListName);
+      } else {
+        setState(
+          () {
+            appLinkCheckFinished = true;
+          },
+        );
+      }
+    }
   }
 
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -113,126 +231,29 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen>
 
   StreamSubscription? _streamSubscription;
 
-  Future<void> _initURIHandler() async {
-    log.d("_initURIHandler invoked!");
-    if (!_initialURILinkHandled) {
-      _initialURILinkHandled = true;
-      try {
-        final initialURI = await getInitialUri();
-        // Use the initialURI and warn the user if it is not correct,
-        // but keep in mind it could be `null`.
-        if (initialURI != null) {
-          log.d("Initial URI received $initialURI");
-          if (!mounted) {
-            return;
-          }
-          setState(() {
-            _initialURI = initialURI;
-          });
-          log.d("_initialURI set to: ${_initialURI.toString()}");
-          await loadSharedList(_initialURI!);
-        } else {
-          log.d("Null Initial URI received");
-          setState(() {
-            appLinkCheckFinished = true;
-          });
-        }
-      } on PlatformException {
-        // Platform messages may fail, so we use a try/catch PlatformException.
-        // Handle exception by warning the user their action did not succeed
-        log.d("Failed to receive initial uri");
-      } on FormatException catch (err) {
-        if (!mounted) {
-          return;
-        }
-        log.d('Malformed Initial URI received');
-        setState(() => _err = err);
-      }
-    }
-  }
+  Future<void> loadSharedList(String shoppingListId) async {
+    log.d("loadSharedList with uri: $shoppingListId");
 
-  _incomingLinkHandler() {
-    log.d("_incomingLinkHandler invoked!");
-    _streamSubscription = uriLinkStream.listen((Uri? uri) async {
-      log.d("_incomingLinkHandler listen invoked!");
-      appLinkCheckFinished = false;
-      if (!mounted) {
-        return;
-      }
-      log.d('Received URI: $uri');
-      _currentURI = uri;
-      _err = null;
-      setState(() {
-        appLinkCheckFinished = false;
-      });
-      await loadSharedList(_currentURI!);
-    }, onError: (Object err) {
-      if (!mounted) {
-        return;
-      }
-      log.d('Error occurred: $err');
-      setState(() {
-        _currentURI = null;
-        appLinkCheckFinished = true;
-        if (err is FormatException) {
-          _err = err;
-        } else {
-          _err = null;
-        }
-      });
-    });
-  }
+    await _mainDaoController.addUserToShoppingList(
+        _userDataController.user, shoppingListId);
 
-  Future<void> loadSharedList(Uri uri) async {
-    log.d("loadSharedList with uri: $uri");
-    if (_currentURI != null) {
+    await _mainDaoController.getAllComplexShoppingListByUser(
+        _userDataController.user, shoppingListId, true, false, true);
 
-      String shoppingListId = _currentURI!.queryParameters['shoppingList']!;
-      _currentURI = null;
+    await _mainDaoController.selectShoppingList(shoppingListId);
 
-      /*final stream = Stream.fromFutures([
-      _mainDaoController.addUserToShoppingList(
-          _userDataController.user, shoppingListId),
-      _mainDaoController.getAllComplexShoppingListByUser(
-          _userDataController.user, shoppingListId, true, false, true),
-      _mainDaoController.selectShoppingList(shoppingListId)
-    ]);
-
-    stream.asyncMap((event) => null).drain(null);
-*/
-
-      await _mainDaoController.addUserToShoppingList(
-          _userDataController.user, shoppingListId);
-
-      await _mainDaoController.getAllComplexShoppingListByUser(
-          _userDataController.user, shoppingListId, true, false, true);
-
-      await _mainDaoController.selectShoppingList(shoppingListId);
-
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => const ShoppingListGroupView()))
-          .then((value) => shoppingListOnUser =
-          _mainDaoController.getAllComplexShoppingListByUser(
-              _userDataController.user, null, true, false, true))
-          .then((value) => setState(
-            () {
-          appLinkCheckFinished = true;
-        },
-      ));
-
-    }
-    else {
-
-      setState(
-            () {
-          appLinkCheckFinished = true;
-        },
-      );
-
-    }
-
+    Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const ShoppingListGroupView()))
+        .then((value) => shoppingListOnUser =
+            _mainDaoController.getAllComplexShoppingListByUser(
+                _userDataController.user, null, true, false, true))
+        .then((value) => setState(
+              () {
+                appLinkCheckFinished = true;
+              },
+            ));
   }
 
   Widget checkSharedList(ShoppingListComplexModel shoppingListComplexModel) {
@@ -369,6 +390,7 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen>
                                           top: 10, left: 0, bottom: 10),
                                       child: Icon(
                                         Icons.add,
+                                        size: 35,
                                         color: Colors.black,
                                       ),
                                     ),
@@ -377,7 +399,7 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen>
                                       style: TextStyle(
                                           color: Colors.black,
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 18),
+                                          fontSize: 15),
                                     ),
                                   ],
                                 ),
@@ -450,6 +472,8 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen>
                               child: ScaleAnimation(
                                 child: FadeInAnimation(
                                   child: Card(
+                                    //elevation: 30,
+                                    //shadowColor: Colors.green,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(15.0),
                                     ),
@@ -604,8 +628,30 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen>
                                                       }
                                                       if (value ==
                                                           'Megosztás') {
-                                                        share(
-                                                            'hotdeal://kebodev.hu/?shoppingList=${data[index].id.oid}');
+                                                        final dynamicLinkParams =
+                                                            DynamicLinkParameters(
+                                                          link: Uri.parse(
+                                                              "https://szatyor.eu/?shoppingListId=${data[index].id.oid}&shoppingListName=${data[index].listName}"),
+                                                          uriPrefix:
+                                                              "https://szatyor.page.link",
+                                                          androidParameters:
+                                                              const AndroidParameters(
+                                                                  packageName:
+                                                                      "com.kebodev.szatyor"),
+                                                          iosParameters:
+                                                              const IOSParameters(
+                                                                  bundleId:
+                                                                      "com.kebodev.szatyor"),
+                                                        );
+                                                        final dynamicLink =
+                                                            await FirebaseDynamicLinks
+                                                                .instance
+                                                                .buildShortLink(
+                                                                    dynamicLinkParams);
+
+                                                        share(dynamicLink
+                                                            .shortUrl
+                                                            .toString());
                                                       }
                                                     }),
                                               ),

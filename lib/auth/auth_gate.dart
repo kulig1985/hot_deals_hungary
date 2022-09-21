@@ -30,7 +30,7 @@ class _AuthGateState extends State<AuthGate> {
                   EmailProviderConfiguration(),
                   GoogleProviderConfiguration(
                       clientId:
-                          '1028524662787-4rv061tnikes9eovpvjf0m0no2qmpecv.apps.googleusercontent.com'),
+                          '1028524662787-jft08l4pb568mpt4vp3g1m6l0a7ad6m8.apps.googleusercontent.com'),
                   FacebookProviderConfiguration(clientId: '3249979211885631')
                 ],
                 subtitleBuilder: (context, _) {

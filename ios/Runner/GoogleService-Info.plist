@@ -3,9 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>1028524662787-4rv061tnikes9eovpvjf0m0no2qmpecv.apps.googleusercontent.com</string>
+	<string>1028524662787-jft08l4pb568mpt4vp3g1m6l0a7ad6m8.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.1028524662787-4rv061tnikes9eovpvjf0m0no2qmpecv</string>
+	<string>com.googleusercontent.apps.1028524662787-jft08l4pb568mpt4vp3g1m6l0a7ad6m8</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>1028524662787-12aj8bk8o7amiepscj45bd8tn8d6fbau.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyDo-CysIFZ6RnstFEQlQqPGl-J1xPhvppw</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.hotDealsHungary</string>
+	<string>com.kebodev.szatyor</string>
 	<key>PROJECT_ID</key>
 	<string>hot-deals-hungary</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:1028524662787:ios:d622fa7bb0a2f69f38ee36</string>
+	<string>1:1028524662787:ios:23800d08d7cba0b038ee36</string>
 </dict>
 </plist>

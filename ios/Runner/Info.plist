@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Hot Deals Hungary</string>
+	<string>Szatyor</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>hot_deals_hungary</string>
+	<string>Szatyor</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -35,7 +35,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.1028524662787-4rv061tnikes9eovpvjf0m0no2qmpecv</string>
+				<string>com.googleusercontent.apps.1028524662787-jft08l4pb568mpt4vp3g1m6l0a7ad6m8</string>
 			</array>
 		</dict>
 		<dict>
@@ -46,6 +46,16 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>hotdeal</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>Boundle Id</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.kebodev.szatyor</string>
 			</array>
 		</dict>
 	</array>

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1028524662787",
+    "project_id": "hot-deals-hungary",
+    "storage_bucket": "hot-deals-hungary.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1028524662787:android:decc0095ea5610f338ee36",
+        "android_client_info": {
+          "package_name": "com.example.hot_deals_hungary"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1028524662787-89ndmpef1vqelmiag05sguofp479dp7t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWryOJWmYdK0kJ6ARVwGkJhHLc_aWskes"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1028524662787-89ndmpef1vqelmiag05sguofp479dp7t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -65,11 +65,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDo-CysIFZ6RnstFEQlQqPGl-J1xPhvppw',
-    appId: '1:1028524662787:ios:d622fa7bb0a2f69f38ee36',
+    appId: '1:1028524662787:ios:23800d08d7cba0b038ee36',
     messagingSenderId: '1028524662787',
     projectId: 'hot-deals-hungary',
     storageBucket: 'hot-deals-hungary.appspot.com',
-    iosClientId: '1028524662787-4rv061tnikes9eovpvjf0m0no2qmpecv.apps.googleusercontent.com',
-    iosBundleId: 'com.example.hotDealsHungary',
+    iosClientId:
+        '1028524662787-jft08l4pb568mpt4vp3g1m6l0a7ad6m8.apps.googleusercontent.com',
+    iosBundleId: 'com.kebodev.szatyor',
   );
 }

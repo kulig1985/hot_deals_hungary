@@ -126,17 +126,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 titleName: 'Profil',
                 backButtonchooser: false,
               ),*/
-                  const Divider(
-                    color: Colors.black12,
-                  ),
-                  Center(
-                    child: Text(
-                      "Süssön rád a 🌞 kedves ${checkUserNameExist(_userDataController.user)} a következő azonosítóval tudod megosztani a listáidat. Csak rá kell klikkelj és már is kimaásoltad!",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 20, color: Colors.white),
+                  Container(
+                    margin: EdgeInsets.only(top: 30),
+                    child: Center(
+                      child: Text(
+                        "Süssön rád a 🌞 kedves ${checkUserNameExist(_userDataController.user)}!",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 20, color: Colors.white),
+                      ),
                     ),
                   ),
-                  Container(
+                  /*Container(
                     margin: EdgeInsets.only(left: 10, right: 10),
                     child: Padding(
                       padding:
@@ -187,16 +187,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         ],
                       ),
                     ),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () async {
-                      await _signOut();
-                    },
-                    icon: const Icon(Icons.logout),
-                    label: const Text("Kilépés"),
-                    style: ElevatedButton.styleFrom(
-                        textStyle: const TextStyle(fontSize: 15),
-                        primary: const Color.fromRGBO(196, 99, 82, 1)),
+                  ),*/
+                  Container(
+                    margin: EdgeInsets.only(top: 100),
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        await _signOut();
+                      },
+                      icon: const Icon(Icons.logout),
+                      label: const Text("Kilépés"),
+                      style: ElevatedButton.styleFrom(
+                          textStyle: const TextStyle(fontSize: 15),
+                          primary: const Color.fromRGBO(196, 99, 82, 1)),
+                    ),
                   )
                 ],
               )

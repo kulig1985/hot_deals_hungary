@@ -164,7 +164,7 @@ class _ShoppingListGroupViewState extends State<ShoppingListGroupView>
     Offer? offer = offerModelList.offers
         .firstWhereOrNull((element) => element.isSelectedFlag == 1);
     if (offer != null) {
-      return offer.itemCleanName;
+      return "${offer.itemCleanName} - ${offer.price},-Ft";
     } else {
       if (offerModelList.offers.isNotEmpty) {
         return "${offerModelList.offers.length} találat ${offerModelList.offers[0].price} Ft-tól";
@@ -568,7 +568,8 @@ class _ShoppingListGroupViewState extends State<ShoppingListGroupView>
                                           ),
                                           Expanded(
                                             child: Container(
-                                              margin: EdgeInsets.only(left: 10, top: 5, bottom: 5),
+                                              margin: EdgeInsets.only(
+                                                  left: 10, top: 5, bottom: 5),
                                               width: double.infinity,
                                               decoration: const BoxDecoration(
                                                   color: Color.fromRGBO(
@@ -579,22 +580,29 @@ class _ShoppingListGroupViewState extends State<ShoppingListGroupView>
                                                     .toInt()],*/
                                                   borderRadius:
                                                       BorderRadius.horizontal(
-                                                          left:
-                                                              Radius.circular(5),
-                                                          right: Radius.circular(
-                                                              5))),
+                                                          left: Radius.circular(
+                                                              5),
+                                                          right:
+                                                              Radius.circular(
+                                                                  5))),
                                               child: Column(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Row(
                                                     mainAxisAlignment:
-                                                    MainAxisAlignment.start,
+                                                        MainAxisAlignment.start,
                                                     children: [
                                                       Expanded(
                                                         child: Padding(
-                                                          padding: const EdgeInsets.only(top: 5, left: 10, bottom: 5),
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  top: 5,
+                                                                  left: 10,
+                                                                  bottom: 5),
                                                           child: Text(
                                                             selectedShopName(
                                                                     _mainDaoController
@@ -611,15 +619,19 @@ class _ShoppingListGroupViewState extends State<ShoppingListGroupView>
                                                                     .offerListenerEntity
                                                                     .itemName,
                                                             style: const TextStyle(
-                                                                color: Colors.black,
+                                                                color: Colors
+                                                                    .black,
                                                                 fontWeight:
-                                                                    FontWeight.w500,
+                                                                    FontWeight
+                                                                        .w500,
                                                                 fontSize: 18),
                                                           ),
                                                         ),
                                                       ),
                                                       Padding(
-                                                        padding: const EdgeInsets.only(top: 5),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(top: 5),
                                                         child: Expandable(
                                                           firstChild: Container(
                                                             height: 20,
@@ -631,9 +643,8 @@ class _ShoppingListGroupViewState extends State<ShoppingListGroupView>
                                                                 borderRadius:
                                                                     const BorderRadius
                                                                             .all(
-                                                                        Radius
-                                                                            .circular(
-                                                                                5)),
+                                                                        Radius.circular(
+                                                                            5)),
                                                                 color: const Color
                                                                         .fromRGBO(
                                                                     252,
@@ -663,7 +674,8 @@ class _ShoppingListGroupViewState extends State<ShoppingListGroupView>
                                                           ),
                                                           secondChild: Row(
                                                             mainAxisSize:
-                                                                MainAxisSize.min,
+                                                                MainAxisSize
+                                                                    .min,
                                                             mainAxisAlignment:
                                                                 MainAxisAlignment
                                                                     .start,
@@ -685,22 +697,23 @@ class _ShoppingListGroupViewState extends State<ShoppingListGroupView>
                                                                         _mainDaoController
                                                                             .choosenShoppingList
                                                                             .value
-                                                                            .offerModelList[
-                                                                                index]
+                                                                            .offerModelList[index]
                                                                             .offerListenerEntity
                                                                             .id,
                                                                         -1,
                                                                         index);
 
-                                                                    setState(() {});
+                                                                    setState(
+                                                                        () {});
                                                                   }
                                                                 },
-                                                                icon: const Icon(
+                                                                icon:
+                                                                    const Icon(
                                                                   Icons
                                                                       .remove_circle,
                                                                   size: 22,
-                                                                  color:
-                                                                      Colors.black,
+                                                                  color: Colors
+                                                                      .black,
                                                                 ),
                                                               ),
                                                               IconButton(
@@ -719,18 +732,22 @@ class _ShoppingListGroupViewState extends State<ShoppingListGroupView>
                                                                       1,
                                                                       index);
 
-                                                                  setState(() {});
+                                                                  setState(
+                                                                      () {});
                                                                 },
-                                                                icon: const Icon(
-                                                                  Icons.add_circle,
+                                                                icon:
+                                                                    const Icon(
+                                                                  Icons
+                                                                      .add_circle,
                                                                   size: 22,
-                                                                  color:
-                                                                      Colors.black,
+                                                                  color: Colors
+                                                                      .black,
                                                                 ),
                                                               )
                                                             ],
                                                           ),
-                                                          showArrowWidget: false,
+                                                          showArrowWidget:
+                                                              false,
                                                           boxShadow: const [
                                                             BoxShadow(
                                                               color: Colors
@@ -743,12 +760,13 @@ class _ShoppingListGroupViewState extends State<ShoppingListGroupView>
                                                               spreadRadius: 0.0,
                                                             )
                                                           ],
-                                                          backgroundColor: const Color
-                                                                  .fromRGBO(
-                                                              252,
-                                                              236,
-                                                              143,
-                                                              1) /*colors[
+                                                          backgroundColor:
+                                                              const Color
+                                                                      .fromRGBO(
+                                                                  252,
+                                                                  236,
+                                                                  143,
+                                                                  1) /*colors[
                                                                     ((index / 5 -
                                                                                 (index /
                                                                                         5)
@@ -772,7 +790,8 @@ class _ShoppingListGroupViewState extends State<ShoppingListGroupView>
                                                                 context,
                                                                 MaterialPageRoute(
                                                                     builder: (context) => SearchOffersPage(
-                                                                        index: index,
+                                                                        index:
+                                                                            index,
                                                                         itemCleanName: _mainDaoController
                                                                             .choosenShoppingList
                                                                             .value
@@ -795,7 +814,12 @@ class _ShoppingListGroupViewState extends State<ShoppingListGroupView>
                                                           const EdgeInsets.only(
                                                               left: 0),
                                                       child: Padding(
-                                                        padding: const EdgeInsets.only(left: 10, bottom: 5, right: 10),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .only(
+                                                                left: 10,
+                                                                bottom: 5,
+                                                                right: 10),
                                                         child: Text(
                                                           existSelectedOffer(
                                                               _mainDaoController
@@ -803,15 +827,17 @@ class _ShoppingListGroupViewState extends State<ShoppingListGroupView>
                                                                   .value
                                                                   .offerModelList[index]),
                                                           maxLines: 3,
-                                                          overflow:
-                                                              TextOverflow.ellipsis,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
                                                           style: const TextStyle(
                                                               decoration:
                                                                   TextDecoration
                                                                       .underline,
-                                                              color: Colors.black,
+                                                              color:
+                                                                  Colors.black,
                                                               fontWeight:
-                                                                  FontWeight.w300,
+                                                                  FontWeight
+                                                                      .w300,
                                                               fontSize: 16),
                                                         ),
                                                       ),
