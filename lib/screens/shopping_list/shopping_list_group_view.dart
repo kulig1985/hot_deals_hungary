@@ -199,10 +199,13 @@ class _ShoppingListGroupViewState extends State<ShoppingListGroupView>
     textFocus = FocusNode();
   }
 
-  void didChangeAppLifecycleState(AppLifecycleState state) {
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
     log.d("didChangeAppLifecycleState invoked state: $state");
     if (state == AppLifecycleState.resumed) {
-      Navigator.of(context).pop();
+      //Navigator.of(context).pop();
+
+      /*await _mainDaoController
+          .selectShoppingList(_mainDaoController.oldShoppingListoid!);*/
 
       setState(() {});
     }
