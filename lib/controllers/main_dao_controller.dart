@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hot_deals_hungary/models/mongo/change_offer_on_offer_listener.dart';
+import 'package:hot_deals_hungary/models/mongo/create_uid_and_token.dart';
 import 'package:hot_deals_hungary/models/mongo/modify_offer_listener.dart';
 import 'package:hot_deals_hungary/models/mongo/modify_shopping_list_entity.dart';
 import 'package:hot_deals_hungary/models/mongo/offer.dart';
@@ -648,6 +649,25 @@ class MainDaoController extends GetxController {
 
     var response = await _httpClient.patch(uri,
         body: jsonEncode(newShoppingListEntityMap), headers: BASE_HEADER);
+  }
+
+  Future<void> createUidAndToken(
+      User user, String token, String platform) async {
+    log.d("createUidAndToken with ${user.uid} token: $token");
+
+    CreateUidAndToken createUidAndToken = CreateUidAndToken(
+        uid: user.uid,
+        platform: platform,
+        token: token,
+        crDate: createDateString(),
+        boolId: 1);
+
+    var uri = Uri.parse('$BASE_URL/create_platform_and_token_for_uid');
+
+    var response = await _httpClient.post(uri,
+        body: jsonEncode(createUidAndToken), headers: BASE_HEADER);
+
+    log.d("response:${response.body}");
   }
 
   String checkUserNameExist(User user) {

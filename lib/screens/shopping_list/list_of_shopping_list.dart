@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
@@ -26,13 +28,17 @@ import 'package:hot_deals_hungary/screens/components/custom_app_bar.dart';
 import 'package:hot_deals_hungary/screens/shopping_list/shopping_list_group_view.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:logger/logger.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:flutter_fgbg/flutter_fgbg.dart';
 
-Future _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+/*Future _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
   print("Handling a background message: ${message.messageId}");
+  FlutterAppBadger.updateBadgeCount(1);
 }
+*/
 
 class ListOfShoppingListScreen extends StatefulWidget {
   const ListOfShoppingListScreen({Key? key}) : super(key: key);
@@ -69,15 +75,15 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen>
   bool _initialURILinkHandled = false;
   bool appLinkCheckFinished = true;
   bool isLoading = false;
+  String? platformName;
 
-  late int _totalNotifications;
   late final FirebaseMessaging _messaging;
   PushNotification? _notificationInfo;
 
   void requestAndRegisterNotification() async {
     // 2. Instantiate Firebase Messaging
     _messaging = FirebaseMessaging.instance;
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    //FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
     // 3. On iOS, this helps to take the user permissions
     NotificationSettings settings = await _messaging.requestPermission(
@@ -91,6 +97,18 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen>
       log.d('User granted permission');
       String? token = await _messaging.getToken();
       log.d("The token is " + token!);
+
+      if (Platform.isAndroid) {
+        log.d("platfrom is Android!");
+        platformName = "android";
+      } else if (Platform.isIOS) {
+        log.d("platfrom is IOS!");
+        platformName = "ios";
+      }
+
+      _mainDaoController.createUidAndToken(
+          _userDataController.user, token, platformName!);
+
       // For handling the received notifications
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         // Parse the message received
@@ -98,22 +116,26 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen>
           title: message.notification?.title,
           body: message.notification?.body,
         );
+
+        log.d(notification.toString());
+
+        FlutterAppBadger.updateBadgeCount(1);
         /*
         setState(() {
           _notificationInfo = notification;
           _totalNotifications++;
         });
-        if (_notificationInfo != null) {
-          // For displaying the notification as an overlay
-          showSimpleNotification(
-            Text(_notificationInfo!.title!),
-            leading: NotificationBadge(totalNotifications: _totalNotifications),
-            subtitle: Text(_notificationInfo!.body!),
-            background: Colors.cyan.shade700,
-            duration: Duration(seconds: 2),
-          );
-        }
         */
+
+        showSimpleNotification(
+          Text(notification.title!),
+          leading: const Image(
+            image: AssetImage('assets/images/szatyor.png'),
+          ),
+          subtitle: Text(notification.body!),
+          background: const Color.fromRGBO(124, 223, 232, 1),
+          duration: Duration(seconds: 2),
+        );
       });
     } else {
       print('User declined or has not accepted permission');
@@ -169,6 +191,24 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen>
         },
       );
     });
+
+    //_totalNotifications = 0;
+    //FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    requestAndRegisterNotification();
+
+    /*
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      // Parse the message received
+      PushNotification notification = PushNotification(
+        title: message.notification?.title,
+        body: message.notification?.body,
+      );
+
+      log.d(notification.toString());
+
+      FlutterAppBadger.updateBadgeCount(1);
+
+    });*/
   }
 
   showAddSharedListDialog(
@@ -344,8 +384,7 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen>
 
   @override
   Widget build(BuildContext context) {
-    //FlutterAppBadger.updateBadgeCount(1);
-    //FlutterAppBadger.removeBadge();
+    FlutterAppBadger.removeBadge();
 
     return Scaffold(
         appBar: const PreferredSize(
