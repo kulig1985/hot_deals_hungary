@@ -63,7 +63,14 @@ class _ItemPageScreenState extends State<ItemPageScreen> {
                 height: MediaQuery.of(context).size.height / 3,
                 width: double.infinity,
                 margin: EdgeInsets.only(left: 10, right: 10, top: 10),
-                color: Colors.white,
+                decoration: BoxDecoration(
+                    color: const Color.fromRGBO(37, 37, 37, 1),
+                    border: Border.all(
+                        width: 0.5,
+                        color: offer.isSelectedFlag == 0
+                            ? const Color.fromRGBO(43, 47, 58, 1)
+                            : const Color.fromRGBO(255, 171, 145, 1)),
+                    borderRadius: BorderRadius.circular(5.0)),
                 child: FutureBuilder(
                   future: checkImageUrl(
                       'http://95.138.193.102:9988/image_download/${offer.imageUrl}'),

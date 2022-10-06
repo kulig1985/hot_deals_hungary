@@ -14,6 +14,7 @@ import 'package:hot_deals_hungary/models/mongo/shopping_list_complex_model.dart'
 import 'package:hot_deals_hungary/screens/components/custom_app_bar.dart';
 import 'package:hot_deals_hungary/screens/shopping_list/item_page.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
@@ -299,17 +300,19 @@ class _SearchOffersPageState extends State<SearchOffersPage> {
                                                 )));
                                   },
                                   child: Container(
-                                    height: 120,
+                                    height: 90,
                                     margin: const EdgeInsets.only(
-                                        bottom: 2, left: 5, right: 5),
+                                        bottom: 5, left: 5, right: 5),
                                     decoration: BoxDecoration(
-                                        color: Colors.white,
+                                        color:
+                                            const Color.fromRGBO(37, 37, 37, 1),
                                         border: Border.all(
-                                            width: 1,
+                                            width: 0.5,
                                             color: offer.isSelectedFlag == 0
-                                                ? Colors.transparent
+                                                ? const Color.fromRGBO(
+                                                    43, 47, 58, 1)
                                                 : const Color.fromRGBO(
-                                                    104, 237, 173, 1)),
+                                                    43, 47, 58, 1)),
                                         borderRadius:
                                             BorderRadius.circular(5.0)),
                                     child: Row(
@@ -318,6 +321,10 @@ class _SearchOffersPageState extends State<SearchOffersPage> {
                                       children: [
                                         Container(
                                           margin: EdgeInsets.only(left: 5),
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(5.0)),
                                           child: FutureBuilder(
                                             future: checkImageUrl(
                                                 'http://95.138.193.102:9988/image_download/${offer.imageUrl}'),
@@ -365,17 +372,26 @@ class _SearchOffersPageState extends State<SearchOffersPage> {
                                                 Text(
                                                   '${offer.price},-Ft',
                                                   style: const TextStyle(
+                                                      color: Colors.white,
                                                       fontWeight:
                                                           FontWeight.bold),
                                                 ),
                                                 SizedBox(
                                                   width: 200,
                                                   child: AutoSizeText(
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                    ),
                                                     offer.itemName,
                                                     maxLines: 3,
                                                   ),
                                                 ),
-                                                Text(offer.shopName),
+                                                Text(
+                                                  offer.shopName,
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
                                               ],
                                             ),
                                           ),
@@ -383,11 +399,14 @@ class _SearchOffersPageState extends State<SearchOffersPage> {
                                         Visibility(
                                           visible: offer.isSelectedFlag == 0,
                                           child: Container(
+                                            color: const Color.fromRGBO(
+                                                37, 37, 37, 1),
                                             margin: EdgeInsets.only(right: 10),
                                             child: Material(
                                               borderRadius:
                                                   BorderRadius.circular(20),
-                                              color: Colors.white,
+                                              color: const Color.fromRGBO(
+                                                  37, 37, 37, 1),
                                               child: Column(
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
@@ -396,7 +415,7 @@ class _SearchOffersPageState extends State<SearchOffersPage> {
                                                       icon: const FaIcon(
                                                         FontAwesomeIcons
                                                             .cartShopping,
-                                                        color: Colors.grey,
+                                                        color: Colors.white,
                                                       ),
                                                       onPressed: () {
                                                         setState(() {
@@ -443,6 +462,7 @@ class _SearchOffersPageState extends State<SearchOffersPage> {
                                                           TextAlign.center,
                                                       maxLines: 2,
                                                       style: TextStyle(
+                                                          color: Colors.white,
                                                           fontWeight:
                                                               FontWeight.w200),
                                                     ),

@@ -93,6 +93,8 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen>
       sound: true,
     );
 
+    log.d("settings auth: " + settings.authorizationStatus.toString());
+
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       log.d('User granted permission');
       String? token = await _messaging.getToken();
@@ -105,6 +107,15 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen>
         log.d("platfrom is IOS!");
         platformName = "ios";
       }
+
+      FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
+        // TODO: If necessary send token to application server.
+
+        _mainDaoController.createUidAndToken(
+            _userDataController.user, fcmToken, platformName!);
+      }).onError((err) {
+        log.e("token refresh error: " + err);
+      });
 
       _mainDaoController.createUidAndToken(
           _userDataController.user, token, platformName!);
@@ -471,7 +482,7 @@ class _ListOfShoppingListScreenState extends State<ListOfShoppingListScreen>
                               height: 165,
                               decoration: BoxDecoration(
                                   border:
-                                      Border.all(color: Colors.white, width: 2),
+                                      Border.all(color: Colors.white, width: 1),
                                   color: const Color.fromRGBO(104, 237, 173, 1),
                                   borderRadius: BorderRadius.circular(15.0)),
                               margin: const EdgeInsets.only(
